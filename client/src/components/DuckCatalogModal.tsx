@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Award, CheckCircle, Compass, MapPin, PlusCircle, Search, X } from 'lucide-react';
+import { Award, CheckCircle, Clock, Compass, MapPin, PlusCircle, Search, X } from 'lucide-react';
 import { Duck } from '../types/duck';
+import { formatPinnedTimestamp } from '../utils/timeFormat';
 
 interface DuckCatalogModalProps {
   isOpen: boolean;
@@ -110,6 +111,14 @@ export const DuckCatalogModal: React.FC<DuckCatalogModalProps> = ({
                   <div className="meta-line last-found">
                     <MapPin size={13} />
                     <span>Last spotted by: {duck.lastFoundByCity}</span>
+                  </div>
+                )}
+                {duck.lastFoundAt && (
+                  <div className="meta-line last-found-time">
+                    <Clock size={13} />
+                    <span>
+                      Last Pinned: {formatPinnedTimestamp(duck.lastFoundAt).shortDateTime}
+                    </span>
                   </div>
                 )}
               </div>

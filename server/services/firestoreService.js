@@ -313,7 +313,17 @@ class FirestoreService {
 
     // 5. Calculate Great-Circle distance in miles from hometown to Caribbean ship
     const distanceMilesToShip = calculateDistanceMilesToShip(lat, lng);
-    const nowIso = new Date().toISOString();
+    const nowDate = new Date();
+    const nowIso = nowDate.toISOString();
+    const pinnedAtFormatted = nowDate.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
     const discoveryId = `disc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
     const newDiscovery = {
@@ -331,7 +341,9 @@ class FirestoreService {
       deckFound: sanitized.deckFound || duck.originDeck || 'Cruise Ship Deck',
       fingerprintHash,
       verifiedQrSignature: isVerifiedQr,
-      createdAt: nowIso
+      createdAt: nowIso,
+      pinnedAtFormatted,
+      pinnedTimeEpochMs: nowDate.getTime()
     };
 
     // 6. Update Duck metadata

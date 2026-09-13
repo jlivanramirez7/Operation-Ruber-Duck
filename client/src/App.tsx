@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import {
   Anchor,
   Award,
+  Clock,
   Compass,
   Database,
   Globe2,
@@ -21,6 +22,7 @@ import { FindSubmissionModal } from './components/FindSubmissionModal';
 import { DuckCatalogModal } from './components/DuckCatalogModal';
 import { TagGeneratorModal } from './components/TagGeneratorModal';
 import { CruiseStats, Discovery, Duck, ShipPosition } from './types/duck';
+import { formatPinnedTimestamp } from './utils/timeFormat';
 
 const LOCAL_CACHE_KEY = 'cruiseduck_offline_discoveries_cache_v1';
 
@@ -288,6 +290,7 @@ export const App: React.FC = () => {
             <div className="discoveries-feed-list">
               {discoveries.map(item => {
                 const isActive = selectedDiscovery?.id === item.id;
+                const timeInfo = formatPinnedTimestamp(item.createdAt);
                 return (
                   <div
                     key={item.id}
@@ -316,11 +319,10 @@ export const App: React.FC = () => {
 
                     <div className="feed-card-bottom">
                       <span className="feed-deck">📍 {item.deckFound}</span>
-                      {item.verifiedQrSignature && (
-                        <span className="feed-verified" title="Verified Waterproof QR Scan">
-                          <ShieldCheck size={12} /> QR Tag Verified
-                        </span>
-                      )}
+                      <span className="feed-timestamp" title={`Exact Pinned Time: ${timeInfo.fullDateTime}`}>
+                        <Clock size={12} /> {timeInfo.shortDateTime}
+                        {timeInfo.relative ? ` (${timeInfo.relative})` : ''}
+                      </span>
                     </div>
                   </div>
                 );

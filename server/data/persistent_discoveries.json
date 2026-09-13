@@ -1,141 +1,5 @@
 [
   {
-    "id": "disc_1789343465627_ah95i",
-    "duckId": "DUCK-019",
-    "duckName": "Key West Conch Cruiser",
-    "city": "Reykjavik",
-    "region": "Capital Region",
-    "country": "Iceland",
-    "countryCode": "IS",
-    "lat": 64.1466,
-    "lng": -21.9426,
-    "distanceMilesToShip": 3698,
-    "note": "Ahoy from Iceland! Found DUCK-019 after Device A hid it again!",
-    "deckFound": "Cruise Ship Deck",
-    "fingerprintHash": "device_C_android_1789343465614",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:51:05.627Z"
-  },
-  {
-    "id": "disc_1789343465566_fpu1v",
-    "duckId": "DUCK-019",
-    "duckName": "Key West Conch Cruiser",
-    "city": "Honolulu-Test-5529",
-    "region": "HI",
-    "country": "United States",
-    "countryCode": "US",
-    "lat": 21.3069,
-    "lng": -157.8583,
-    "distanceMilesToShip": 5491,
-    "note": "Aloha from Honolulu-Test-5529! Found DUCK-019 by the pool towel station!",
-    "deckFound": "Deck 11 - Pool Deck",
-    "fingerprintHash": "device_A_iphone_1789343465529",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:51:05.566Z"
-  },
-  {
-    "id": "disc_1789342619860_8tfkq",
-    "duckId": "DUCK-019",
-    "duckName": "Cruiser #019 (Key)",
-    "city": "Reykjavik",
-    "region": "Capital Region",
-    "country": "Iceland",
-    "countryCode": "IS",
-    "lat": 64.1466,
-    "lng": -21.9426,
-    "distanceMilesToShip": 3698,
-    "note": "Ahoy from Iceland! Found DUCK-019 after Device A hid it again!",
-    "deckFound": "Cruise Ship Deck",
-    "fingerprintHash": "device_C_android_1789342619705",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:36:59.860Z"
-  },
-  {
-    "id": "disc_1789342619647_c6xg6",
-    "duckId": "DUCK-019",
-    "duckName": "Cruiser #019 (Key)",
-    "city": "Honolulu-Test-9588",
-    "region": "HI",
-    "country": "United States",
-    "countryCode": "US",
-    "lat": 21.3069,
-    "lng": -157.8583,
-    "distanceMilesToShip": 5491,
-    "note": "Aloha from Honolulu-Test-9588! Found DUCK-019 by the pool towel station!",
-    "deckFound": "Deck 11 - Pool Deck",
-    "fingerprintHash": "device_A_iphone_1789342619588",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:36:59.647Z"
-  },
-  {
-    "id": "disc_1789342164038_w5spx",
-    "duckId": "DUCK-019",
-    "duckName": "Cruiser #019 (Key)",
-    "city": "Reykjavik",
-    "region": "Capital Region",
-    "country": "Iceland",
-    "countryCode": "IS",
-    "lat": 64.1466,
-    "lng": -21.9426,
-    "distanceMilesToShip": 3698,
-    "note": "Ahoy from Iceland! Found DUCK-019 after Device A hid it again!",
-    "deckFound": "Cruise Ship Deck",
-    "fingerprintHash": "device_C_android_1789342164024",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:29:24.038Z"
-  },
-  {
-    "id": "disc_1789342163967_wbt07",
-    "duckId": "DUCK-019",
-    "duckName": "Cruiser #019 (Key)",
-    "city": "Honolulu-Test-3923",
-    "region": "HI",
-    "country": "United States",
-    "countryCode": "US",
-    "lat": 21.3069,
-    "lng": -157.8583,
-    "distanceMilesToShip": 5491,
-    "note": "Aloha from Honolulu-Test-3923! Found DUCK-019 by the pool towel station!",
-    "deckFound": "Deck 11 - Pool Deck",
-    "fingerprintHash": "device_A_iphone_1789342163923",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:29:23.967Z"
-  },
-  {
-    "id": "disc_1789341794121_8uzi6",
-    "duckId": "DUCK-019",
-    "duckName": "Cruiser #019 (Key)",
-    "city": "Reykjavik",
-    "region": "Capital Region",
-    "country": "Iceland",
-    "countryCode": "IS",
-    "lat": 64.1466,
-    "lng": -21.9426,
-    "distanceMilesToShip": 3698,
-    "note": "Ahoy from Iceland! Found DUCK-019 after Device A hid it again!",
-    "deckFound": "Cruise Ship Deck",
-    "fingerprintHash": "device_C_android_1789341794101",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:23:14.121Z"
-  },
-  {
-    "id": "disc_1789341793915_ebcr9",
-    "duckId": "DUCK-019",
-    "duckName": "Cruiser #019 (Key)",
-    "city": "Honolulu-Test-3877",
-    "region": "HI",
-    "country": "United States",
-    "countryCode": "US",
-    "lat": 21.3069,
-    "lng": -157.8583,
-    "distanceMilesToShip": 5491,
-    "note": "Aloha from Honolulu-Test-3877! Found DUCK-019 by the pool towel station!",
-    "deckFound": "Deck 11 - Pool Deck",
-    "fingerprintHash": "device_A_iphone_1789341793877",
-    "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T23:23:13.915Z"
-  },
-  {
     "id": "disc_init_01",
     "duckId": "DUCK-001",
     "duckName": "Captain Barnaby Quack",
@@ -145,12 +9,14 @@
     "countryCode": "US",
     "lat": 47.6062,
     "lng": -122.3321,
-    "distanceMilesToShip": 3310,
+    "distanceMilesToShip": 3346,
     "note": "Ahoy from the Pacific Northwest! Found Captain Barnaby near the Lido pool towels! 🦆🌊",
     "deckFound": "Deck 11 - Lido Poolside Tiki Bar",
     "fingerprintHash": "seed_fp_seattle_01",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T21:10:00.000Z"
+    "createdAt": "2026-09-13T21:10:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 9:10:00 PM",
+    "pinnedTimeEpochMs": 1789333800000
   },
   {
     "id": "disc_init_02",
@@ -167,7 +33,9 @@
     "deckFound": "Deck 10 - Serenity Sun Deck",
     "fingerprintHash": "seed_fp_toronto_02",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T19:45:00.000Z"
+    "createdAt": "2026-09-13T19:45:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 7:45:00 PM",
+    "pinnedTimeEpochMs": 1789328700000
   },
   {
     "id": "disc_init_03",
@@ -184,7 +52,9 @@
     "deckFound": "Deck 5 - Royal Promenade Aft",
     "fingerprintHash": "seed_fp_london_03",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T22:05:00.000Z"
+    "createdAt": "2026-09-13T22:05:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 10:05:00 PM",
+    "pinnedTimeEpochMs": 1789337100000
   },
   {
     "id": "disc_init_04",
@@ -201,7 +71,9 @@
     "deckFound": "Deck 8 - Central Park Tropical Garden",
     "fingerprintHash": "seed_fp_sydney_04",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T17:30:00.000Z"
+    "createdAt": "2026-09-13T17:30:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 5:30:00 PM",
+    "pinnedTimeEpochMs": 1789320600000
   },
   {
     "id": "disc_init_05",
@@ -218,7 +90,9 @@
     "deckFound": "Deck 14 - Observation Lounge Forward",
     "fingerprintHash": "seed_fp_tokyo_05",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T22:40:00.000Z"
+    "createdAt": "2026-09-13T22:40:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 10:40:00 PM",
+    "pinnedTimeEpochMs": 1789339200000
   },
   {
     "id": "disc_init_06",
@@ -235,7 +109,9 @@
     "deckFound": "Deck 6 - Schooner Piano Bar",
     "fingerprintHash": "seed_fp_chicago_06",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T19:00:00.000Z"
+    "createdAt": "2026-09-13T19:00:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 7:00:00 PM",
+    "pinnedTimeEpochMs": 1789326000000
   },
   {
     "id": "disc_init_07",
@@ -252,7 +128,9 @@
     "deckFound": "Deck 4 - Casino Royale Entrance",
     "fingerprintHash": "seed_fp_saopaulo_07",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T20:10:00.000Z"
+    "createdAt": "2026-09-13T20:10:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 8:10:00 PM",
+    "pinnedTimeEpochMs": 1789330200000
   },
   {
     "id": "disc_init_08",
@@ -269,7 +147,9 @@
     "deckFound": "Deck 12 - Mini Golf Course Hole 7",
     "fingerprintHash": "seed_fp_munich_08",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T20:45:00.000Z"
+    "createdAt": "2026-09-13T20:45:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 8:45:00 PM",
+    "pinnedTimeEpochMs": 1789332300000
   },
   {
     "id": "disc_init_09",
@@ -286,7 +166,9 @@
     "deckFound": "Deck 11 - Soft Serve Ice Cream Station",
     "fingerprintHash": "seed_fp_miami_09",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T21:30:00.000Z"
+    "createdAt": "2026-09-13T21:30:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 9:30:00 PM",
+    "pinnedTimeEpochMs": 1789335000000
   },
   {
     "id": "disc_init_10",
@@ -303,6 +185,8 @@
     "deckFound": "Deck 5 - Guest Services Atrium",
     "fingerprintHash": "seed_fp_austin_10",
     "verifiedQrSignature": true,
-    "createdAt": "2026-09-13T22:15:00.000Z"
+    "createdAt": "2026-09-13T22:15:00.000Z",
+    "pinnedAtFormatted": "Sep 13, 2026, 10:15:00 PM",
+    "pinnedTimeEpochMs": 1789337700000
   }
 ]

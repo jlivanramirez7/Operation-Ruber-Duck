@@ -227,6 +227,26 @@ async function runTests() {
     console.error('\n❌ TEST FAILED:', err);
   } finally {
     server.close();
+    // Restore clean seed state so automated test runs never leave test records on the live globe
+    const fs = require('fs');
+    const path = require('path');
+    const { INITIAL_DUCKS, INITIAL_DISCOVERIES } = require('../data/seedDucks');
+    const formattedDiscoveries = INITIAL_DISCOVERIES.map(d => ({
+      ...d,
+      pinnedAtFormatted: new Date(d.createdAt).toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      }),
+      pinnedTimeEpochMs: new Date(d.createdAt).getTime()
+    }));
+    fs.writeFileSync(path.join(__dirname, '../data/persistent_ducks.json'), JSON.stringify(INITIAL_DUCKS, null, 2));
+    fs.writeFileSync(path.join(__dirname, '../data/persistent_discoveries.json'), JSON.stringify(formattedDiscoveries, null, 2));
+    fs.writeFileSync(path.join(__dirname, '../data/persistent_rate_limits.json'), JSON.stringify({}, null, 2));
   }
 
   console.log('\n================================================================================');

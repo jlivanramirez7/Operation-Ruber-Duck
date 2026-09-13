@@ -27,6 +27,8 @@ export interface Discovery {
   fingerprintHash?: string;
   verifiedQrSignature: boolean;
   createdAt: string;
+  pinnedAtFormatted?: string;
+  pinnedTimeEpochMs?: number;
 }
 
 export interface ShipPosition {
