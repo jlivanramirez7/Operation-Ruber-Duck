@@ -59,10 +59,29 @@ class FirestoreService {
     this.lastError = null;
     this.triedFallback = false;
 
-    // Ensure initial local persistent files exist with seed ducks & discoveries
-    if (!fs.existsSync(DUCKS_FILE)) {
-      writeLocalJson(DUCKS_FILE, INITIAL_DUCKS);
-    }
+    // Ensure initial local persistent files exist and include all 30 seed ducks
+    const existingDucks = readLocalJson(DUCKS_FILE, []);
+    const duckMap = new Map();
+    INITIAL_DUCKS.forEach(d => duckMap.set(d.duckId, d));
+    existingDucks.forEach(d => {
+      const seed = duckMap.get(d.duckId);
+      if (seed) {
+        duckMap.set(d.duckId, {
+          ...seed,
+          findCount: Math.max(seed.findCount || 0, d.findCount || 0),
+          firstFoundAt: d.firstFoundAt || seed.firstFoundAt,
+          lastFoundAt: d.lastFoundAt || seed.lastFoundAt,
+          lastFoundByCity: d.lastFoundByCity || seed.lastFoundByCity
+        });
+      } else {
+        duckMap.set(d.duckId, d);
+      }
+    });
+    writeLocalJson(
+      DUCKS_FILE,
+      Array.from(duckMap.values()).sort((a, b) => a.duckId.localeCompare(b.duckId))
+    );
+
     if (!fs.existsSync(DISCOVERIES_FILE)) {
       writeLocalJson(DISCOVERIES_FILE, INITIAL_DISCOVERIES);
     }

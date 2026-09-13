@@ -1,5 +1,5 @@
 /**
- * Initial Roster of Custom Caribbean Cruise Ducks (DUCK-001 to DUCK-025)
+ * Initial Roster of 30 Custom Caribbean Cruise Ducks (DUCK-001 to DUCK-030)
  * Hidden by Ivan & Lucas across the ship!
  */
 
@@ -22,7 +22,7 @@ const SHIP_POSITION = {
   lng: -71.1399
 };
 
-const INITIAL_DUCKS = [
+const CUSTOM_DUCK_DEFINITIONS = [
   {
     duckId: 'DUCK-001',
     name: 'Captain Barnaby Quack',
@@ -31,9 +31,7 @@ const INITIAL_DUCKS = [
     findCount: 3,
     firstFoundAt: '2026-09-13T14:20:00.000Z',
     lastFoundAt: '2026-09-13T21:10:00.000Z',
-    lastFoundByCity: 'Seattle, WA, USA',
-    signatureHash: generateDuckSignature('DUCK-001'),
-    active: true
+    lastFoundByCity: 'Seattle, WA, USA'
   },
   {
     duckId: 'DUCK-002',
@@ -43,9 +41,7 @@ const INITIAL_DUCKS = [
     findCount: 2,
     firstFoundAt: '2026-09-13T15:05:00.000Z',
     lastFoundAt: '2026-09-13T19:45:00.000Z',
-    lastFoundByCity: 'Toronto, Canada',
-    signatureHash: generateDuckSignature('DUCK-002'),
-    active: true
+    lastFoundByCity: 'Toronto, Canada'
   },
   {
     duckId: 'DUCK-003',
@@ -55,9 +51,7 @@ const INITIAL_DUCKS = [
     findCount: 2,
     firstFoundAt: '2026-09-13T16:12:00.000Z',
     lastFoundAt: '2026-09-13T22:05:00.000Z',
-    lastFoundByCity: 'London, United Kingdom',
-    signatureHash: generateDuckSignature('DUCK-003'),
-    active: true
+    lastFoundByCity: 'London, United Kingdom'
   },
   {
     duckId: 'DUCK-004',
@@ -67,9 +61,7 @@ const INITIAL_DUCKS = [
     findCount: 1,
     firstFoundAt: '2026-09-13T17:30:00.000Z',
     lastFoundAt: '2026-09-13T17:30:00.000Z',
-    lastFoundByCity: 'Sydney, Australia',
-    signatureHash: generateDuckSignature('DUCK-004'),
-    active: true
+    lastFoundByCity: 'Sydney, Australia'
   },
   {
     duckId: 'DUCK-005',
@@ -79,9 +71,7 @@ const INITIAL_DUCKS = [
     findCount: 2,
     firstFoundAt: '2026-09-13T18:15:00.000Z',
     lastFoundAt: '2026-09-13T22:40:00.000Z',
-    lastFoundByCity: 'Tokyo, Japan',
-    signatureHash: generateDuckSignature('DUCK-005'),
-    active: true
+    lastFoundByCity: 'Tokyo, Japan'
   },
   {
     duckId: 'DUCK-006',
@@ -91,9 +81,7 @@ const INITIAL_DUCKS = [
     findCount: 1,
     firstFoundAt: '2026-09-13T19:00:00.000Z',
     lastFoundAt: '2026-09-13T19:00:00.000Z',
-    lastFoundByCity: 'Chicago, IL, USA',
-    signatureHash: generateDuckSignature('DUCK-006'),
-    active: true
+    lastFoundByCity: 'Chicago, IL, USA'
   },
   {
     duckId: 'DUCK-007',
@@ -103,9 +91,7 @@ const INITIAL_DUCKS = [
     findCount: 1,
     firstFoundAt: '2026-09-13T20:10:00.000Z',
     lastFoundAt: '2026-09-13T20:10:00.000Z',
-    lastFoundByCity: 'São Paulo, Brazil',
-    signatureHash: generateDuckSignature('DUCK-007'),
-    active: true
+    lastFoundByCity: 'São Paulo, Brazil'
   },
   {
     duckId: 'DUCK-008',
@@ -115,9 +101,7 @@ const INITIAL_DUCKS = [
     findCount: 1,
     firstFoundAt: '2026-09-13T20:45:00.000Z',
     lastFoundAt: '2026-09-13T20:45:00.000Z',
-    lastFoundByCity: 'Munich, Germany',
-    signatureHash: generateDuckSignature('DUCK-008'),
-    active: true
+    lastFoundByCity: 'Munich, Germany'
   },
   {
     duckId: 'DUCK-009',
@@ -127,9 +111,7 @@ const INITIAL_DUCKS = [
     findCount: 0,
     firstFoundAt: null,
     lastFoundAt: null,
-    lastFoundByCity: null,
-    signatureHash: generateDuckSignature('DUCK-009'),
-    active: true
+    lastFoundByCity: null
   },
   {
     duckId: 'DUCK-010',
@@ -139,9 +121,7 @@ const INITIAL_DUCKS = [
     findCount: 1,
     firstFoundAt: '2026-09-13T21:30:00.000Z',
     lastFoundAt: '2026-09-13T21:30:00.000Z',
-    lastFoundByCity: 'Miami, FL, USA',
-    signatureHash: generateDuckSignature('DUCK-010'),
-    active: true
+    lastFoundByCity: 'Miami, FL, USA'
   },
   {
     duckId: 'DUCK-011',
@@ -151,9 +131,7 @@ const INITIAL_DUCKS = [
     findCount: 0,
     firstFoundAt: null,
     lastFoundAt: null,
-    lastFoundByCity: null,
-    signatureHash: generateDuckSignature('DUCK-011'),
-    active: true
+    lastFoundByCity: null
   },
   {
     duckId: 'DUCK-012',
@@ -163,45 +141,195 @@ const INITIAL_DUCKS = [
     findCount: 1,
     firstFoundAt: '2026-09-13T22:15:00.000Z',
     lastFoundAt: '2026-09-13T22:15:00.000Z',
-    lastFoundByCity: 'Austin, TX, USA',
-    signatureHash: generateDuckSignature('DUCK-012'),
-    active: true
-  }
-];
-
-// Generate remaining ducks up to DUCK-025 so hiders have a full ready-to-print fleet
-const THEMES = [
-  'Sunset Hammock Duck',
-  'St. Thomas Treasure Hunter',
-  'Bahama Mama Flamingo Duck',
-  'Reggae Beach Surfer',
-  'Deep Sea Scuba Quack',
-  'Castaway Island Explorer',
-  'Key West Conch Cruiser',
-  'San Juan Fortress Sentry',
-  'Tiki Torch Guardian',
-  'Dolphin Whisperer Duck',
-  'Starboard Watch Lookout',
-  'Coconut Cabana VIP',
-  'Golden Compass Navigator'
-];
-
-for (let i = 13; i <= 25; i++) {
-  const num = String(i).padStart(3, '0');
-  const duckId = `DUCK-${num}`;
-  INITIAL_DUCKS.push({
-    duckId,
-    name: `Cruiser #${num} (${THEMES[(i - 13) % THEMES.length].split(' ')[0]})`,
-    theme: THEMES[(i - 13) % THEMES.length],
-    originDeck: `Deck ${(i % 10) + 5} - Secret Cruise Alcove`,
+    lastFoundByCity: 'Austin, TX, USA'
+  },
+  {
+    duckId: 'DUCK-013',
+    name: 'Sunset Hammock Quack',
+    theme: 'Sunset Hammock Duck',
+    originDeck: 'Deck 10 - Aft Hammock Lounge',
     findCount: 0,
     firstFoundAt: null,
     lastFoundAt: null,
-    lastFoundByCity: null,
-    signatureHash: generateDuckSignature(duckId),
-    active: true
-  });
-}
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-014',
+    name: 'St. Thomas Treasure Hunter',
+    theme: 'Golden Compass Buccaneer',
+    originDeck: 'Deck 6 - Boardwalk Carousel',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-015',
+    name: 'Bahama Mama Flamingo',
+    theme: 'Pink Flamingo Floatie Duck',
+    originDeck: 'Deck 11 - Splashaway Bay Waterpark',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-016',
+    name: 'Reggae Beach Surfer',
+    theme: 'Surfboard Wave Rider',
+    originDeck: 'Deck 16 - FlowRider Surf Simulator',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-017',
+    name: 'Deep Sea Scuba Quack',
+    theme: 'Scuba Mask & Flippers Duck',
+    originDeck: 'Deck 5 - Shore Excursions Desk',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-018',
+    name: 'Castaway Island Explorer',
+    theme: 'Tropical Safari Hat Duck',
+    originDeck: 'Deck 8 - Tropical Plant Planter #4',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-019',
+    name: 'Key West Conch Cruiser',
+    theme: 'Key Lime Pie Sailor Duck',
+    originDeck: 'Deck 11 - Poolside Towel Station',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-020',
+    name: 'San Juan Fortress Sentry',
+    theme: 'El Morro Castle Guard Duck',
+    originDeck: 'Deck 14 - Forward Starboard Overlook',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-021',
+    name: 'Tiki Torch Guardian',
+    theme: 'Polynesian Tiki Mask Duck',
+    originDeck: 'Deck 11 - Bamboo Tiki Lounge',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-022',
+    name: 'Dolphin Whisperer',
+    theme: 'Turquoise Dolphin Rider Duck',
+    originDeck: 'Deck 12 - Running Track Starboard',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-023',
+    name: 'Starboard Watch Lookout',
+    theme: 'Brass Spyglass Binocular Duck',
+    originDeck: 'Deck 14 - Bridge Viewing Window',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-024',
+    name: 'Coconut Cabana VIP',
+    theme: 'Coconut Drink & Umbrella Duck',
+    originDeck: 'Deck 15 - VIP Cabana Sun Deck',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-025',
+    name: 'Golden Compass Navigator',
+    theme: 'Astrolabe & Sextant Explorer',
+    originDeck: 'Deck 7 - Compass Rose Lounge',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-026',
+    name: 'Grand Turk Islander',
+    theme: 'Turks & Caicos Conch Diver',
+    originDeck: 'Deck 4 - Main Dining Room Entrance',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-027',
+    name: 'Aruba Aloe Breeze',
+    theme: 'Divi-Divi Tree Beach Duck',
+    originDeck: 'Deck 9 - Elevator Lobby Midship',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-028',
+    name: 'Curaçao Blue Lagoon',
+    theme: 'Rainbow Waterfront Cruiser',
+    originDeck: 'Deck 5 - Sorrentos Pizza Counter',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-029',
+    name: 'St. Maarten Jet Blast',
+    theme: 'Maho Beach Pilot Aviator Duck',
+    originDeck: 'Deck 12 - Sky Bar Upper Terrace',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  },
+  {
+    duckId: 'DUCK-030',
+    name: 'Captain’s Grand Finale',
+    theme: 'Golden Crown Royal Duck #30',
+    originDeck: 'Deck 5 - Royal Theater Balcony',
+    findCount: 0,
+    firstFoundAt: null,
+    lastFoundAt: null,
+    lastFoundByCity: null
+  }
+];
+
+const INITIAL_DUCKS = CUSTOM_DUCK_DEFINITIONS.map(d => ({
+  ...d,
+  signatureHash: generateDuckSignature(d.duckId),
+  active: true
+}));
 
 const INITIAL_DISCOVERIES = [
   {
@@ -214,7 +342,7 @@ const INITIAL_DISCOVERIES = [
     countryCode: 'US',
     lat: 47.6062,
     lng: -122.3321,
-    distanceMilesToShip: 3310,
+    distanceMilesToShip: 3346,
     note: 'Ahoy from the Pacific Northwest! Found Captain Barnaby near the Lido pool towels! 🦆🌊',
     deckFound: 'Deck 11 - Lido Poolside Tiki Bar',
     fingerprintHash: 'seed_fp_seattle_01',

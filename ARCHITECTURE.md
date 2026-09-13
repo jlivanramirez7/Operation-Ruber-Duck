@@ -60,7 +60,7 @@ graph TB
 
 All persistent game state is stored in **Google Cloud Firestore** within the named database **`operationruberduck-db`**.
 
-- **Collection `ducks` (`ducks/{duckId}`)**: Master catalog of hidden cruise ducks (`DUCK-001` through `DUCK-050`), their hiding deck hints, cryptographic signature hashes, and total find counts.
+- **Collection `ducks` (`ducks/{duckId}`)**: Master catalog of hidden cruise ducks (`DUCK-001` through `DUCK-030`), their hiding deck hints, cryptographic signature hashes, and total find counts.
 - **Collection `discoveries` (`discoveries/{discoveryId}`)**: Verified duck sightings with zero PII (`city`, `region`, `country`, `lat`, `lng`, `distanceMilesToShip`, `note`, `deckFound`, `createdAt`).
 - **Collection `rate_limits` (`rate_limits/{fingerprintHash}`)**: Cruise-ship NAT-safe device cooldown records (prevents multiple submissions from the same device within 1 hour without blocking the cruise ship's shared Carrier-Grade NAT IP).
 

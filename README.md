@@ -30,7 +30,7 @@ A full-stack physical-to-digital IoT/Web scavenger hunt built for a father-and-s
      4. **Strict 100-Character Note Enforcement**
 
 4. **Built-In Waterproof QR Tag Studio (`TagGeneratorModal.tsx`):**
-   - Generates ready-to-print `1.5" × 1.5"` waterproof QR label sheets with Level-H (30% recovery) QR codes and embedded cryptographic signatures for `DUCK-001` through `DUCK-025+`.
+   - Generates ready-to-print `1.5" × 1.5"` waterproof QR label sheets with Level-H (30% recovery) QR codes and embedded cryptographic signatures for `DUCK-001` through `DUCK-030`.
 
 ---
 
@@ -54,14 +54,14 @@ Operation-Ruber-Duck/
 │       └── components/
 │           ├── GlobeView.tsx       # 3D Interactive Spinning Globe with glowing pins & flight arcs
 │           ├── FindSubmissionModal.tsx # Mobile-first City/Country picker modal with anti-spam check
-│           ├── DuckCatalogModal.tsx # Captain's Duck Fleet Roster (DUCK-001 to DUCK-025)
-│           └── TagGeneratorModal.tsx # Printable Waterproof QR Code Tag Studio
+│           ├── DuckCatalogModal.tsx # Captain's Duck Fleet Roster (DUCK-001 to DUCK-030)
+│           └── TagGeneratorModal.tsx # Printable Waterproof QR Code Tag Studio (30 Ducks)
 ├── server/                         # Node.js 22 / Express Backend Server (Google Cloud Run)
 │   ├── index.js                    # Express API Server + Static SPA Host
 │   ├── services/
 │   │   ├── firestoreService.js     # Stateful Cloud Firestore service targeting `operationruberduck-db`
 │   │   └── antiSpamService.js      # Maritime NAT-safe rate limiter, HMAC validator, & PII scrubber
-│   ├── data/seedDucks.js           # Initial fleet of 25 custom Caribbean Cruise Ducks
+│   ├── data/seedDucks.js           # Initial fleet of 30 custom Caribbean Cruise Ducks
 │   └── tests/
 │       └── databaseAndApi.test.js  # Automated QA Verification Suite proving cross-device DB persistence
 ├── Dockerfile                      # Multi-stage Docker build (Vite React frontend -> Express Node.js 22 container)

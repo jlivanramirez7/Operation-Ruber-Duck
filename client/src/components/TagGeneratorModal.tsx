@@ -13,7 +13,7 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
   onClose,
   ducks
 }) => {
-  const [selectedCount, setSelectedCount] = useState<number>(12);
+  const [selectedCount, setSelectedCount] = useState<number>(30);
 
   if (!isOpen) return null;
 
@@ -30,9 +30,9 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
           <div>
             <div className="modal-header-badge">
               <QrCode size={16} />
-              <span>PHYSICAL WATERPROOF QR TAG STUDIO</span>
+              <span>PHYSICAL WATERPROOF QR TAG STUDIO (30 DUCKS)</span>
             </div>
-            <h2 className="modal-title">Printable 1.5" × 1.5" Waterproof Duck Tags</h2>
+            <h2 className="modal-title">Printable 1.5" × 1.5" Waterproof Duck Tags (DUCK-001 to DUCK-030)</h2>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close tag studio">
             <X size={20} />
@@ -54,11 +54,12 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
             >
               <option value={6}>Show First 6 Tags</option>
               <option value={12}>Show First 12 Tags</option>
-              <option value={25}>Show All 25 Tags</option>
+              <option value={20}>Show First 20 Tags</option>
+              <option value={30}>Show All 30 Tags</option>
             </select>
             <button type="button" className="btn-caribbean-primary" onClick={handlePrintTags}>
               <Printer size={16} />
-              <span>Print Waterproof Tag Sheet</span>
+              <span>Print All {Math.min(selectedCount, ducks.length)} Waterproof Tags</span>
             </button>
           </div>
         </div>

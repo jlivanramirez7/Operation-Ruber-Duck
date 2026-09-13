@@ -74,7 +74,24 @@ async function runTests() {
       'operationruberduck-db',
       `Expected databaseId to be 'operationruberduck-db', got '${healthRes.body.databaseId}'`
     );
-    console.log(`   ✅ Verified databaseId === 'operationruberduck-db'`);
+
+    const ducksRes = await requestJson(server, 'GET', '/api/ducks');
+    assert.strictEqual(ducksRes.status, 200, 'GET /api/ducks should return HTTP 200');
+    assert.ok(
+      Array.isArray(ducksRes.body.ducks) && ducksRes.body.ducks.length >= 30,
+      `Expected at least 30 ducks in fleet, got ${ducksRes.body.ducks?.length}`
+    );
+    for (let i = 1; i <= 30; i++) {
+      const duckId = `DUCK-${String(i).padStart(3, '0')}`;
+      const duckObj = ducksRes.body.ducks.find(d => d.duckId === duckId);
+      assert.ok(duckObj, `Missing ${duckId} in fleet catalog`);
+      assert.strictEqual(
+        duckObj.signatureHash,
+        generateDuckSignature(duckId),
+        `Invalid QR HMAC signature for ${duckId}`
+      );
+    }
+    console.log(`   ✅ Verified databaseId === 'operationruberduck-db' & all 30 ducks (DUCK-001 to DUCK-030) with valid QR HMAC signatures`);
     passed++;
 
     // ------------------------------------------------------------------------
