@@ -30,5 +30,21 @@
     "recentDucks": {
       "DUCK-019": 1789342164025
     }
+  },
+  "device_A_iphone_1789342619588": {
+    "lastSubmissionAt": "2026-09-13T23:36:59.616Z",
+    "lastSubmissionMs": 1789342619616,
+    "submissionCountHour": 1,
+    "recentDucks": {
+      "DUCK-019": 1789342619616
+    }
+  },
+  "device_C_android_1789342619705": {
+    "lastSubmissionAt": "2026-09-13T23:36:59.707Z",
+    "lastSubmissionMs": 1789342619707,
+    "submissionCountHour": 1,
+    "recentDucks": {
+      "DUCK-019": 1789342619707
+    }
   }
 }

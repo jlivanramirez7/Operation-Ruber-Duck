@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Globe from 'react-globe.gl';
-import { Compass, MapPin, Navigation, Pause, Play, Ship, Sparkles } from 'lucide-react';
+import * as THREE from 'three';
+import { Compass, MapPin, Navigation, Pause, Play, Ship, Sparkles, ZoomIn, ZoomOut } from 'lucide-react';
 import { Discovery, ShipPosition } from '../types/duck';
+import { createWorldGlobeTexture, latLngToVector3 } from '../utils/worldMapTexture';
 
 interface GlobeViewProps {
   discoveries: Discovery[];
@@ -10,117 +11,369 @@ interface GlobeViewProps {
   onSelectDiscovery: (discovery: Discovery) => void;
 }
 
+interface ProjectedPinOverlay {
+  id: string;
+  label: string;
+  sublabel: string;
+  x: number;
+  y: number;
+  visible: boolean;
+  isShip: boolean;
+  isSelected: boolean;
+  discovery: Discovery | null;
+}
+
+const GLOBE_RADIUS = 100;
+
 export const GlobeView: React.FC<GlobeViewProps> = ({
   discoveries,
   shipPosition,
   selectedDiscovery,
   onSelectDiscovery
 }) => {
-  const globeRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 520 });
-  const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const mountRef = useRef<HTMLDivElement>(null);
+  const globeGroupRef = useRef<THREE.Group | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const targetRotationRef = useRef<{ x: number; y: number }>({
+    x: (22 * Math.PI) / 180,
+    y: -((-76 + 90) * Math.PI) / 180
+  });
+  const isDraggingRef = useRef<boolean>(false);
+  const previousMouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isAutoRotating, setIsAutoRotating] = useState<boolean>(true);
+  const isAutoRotatingRef = useRef<boolean>(true);
+  const [projectedOverlays, setProjectedOverlays] = useState<ProjectedPinOverlay[]>([]);
 
   useEffect(() => {
-    const updateSize = () => {
-      if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight
-        });
-      }
-    };
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
-
-  useEffect(() => {
-    if (globeRef.current) {
-      const controls = globeRef.current.controls();
-      if (controls) {
-        controls.autoRotate = isAutoRotating;
-        controls.autoRotateSpeed = 0.65;
-        controls.enableZoom = true;
-      }
-      // Initial camera focus on the Americas / Caribbean corridor
-      globeRef.current.pointOfView({ lat: 24.5, lng: -76.0, altitude: 2.05 }, 1200);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (globeRef.current) {
-      const controls = globeRef.current.controls();
-      if (controls) {
-        controls.autoRotate = isAutoRotating;
-      }
-    }
+    isAutoRotatingRef.current = isAutoRotating;
   }, [isAutoRotating]);
 
+  // Smoothly center globe on a specific (lat, lng)
+  const centerGlobeOnLatLng = (lat: number, lng: number) => {
+    setIsAutoRotating(false);
+    isAutoRotatingRef.current = false;
+    targetRotationRef.current = {
+      x: Math.max(-0.9, Math.min(0.9, (lat * Math.PI) / 180)),
+      y: -((lng + 90) * Math.PI) / 180
+    };
+  };
+
   useEffect(() => {
-    if (selectedDiscovery && globeRef.current) {
-      setIsAutoRotating(false);
-      globeRef.current.pointOfView(
-        {
-          lat: selectedDiscovery.lat,
-          lng: selectedDiscovery.lng,
-          altitude: 1.45
-        },
-        1100
-      );
+    if (selectedDiscovery) {
+      centerGlobeOnLatLng(selectedDiscovery.lat, selectedDiscovery.lng);
     }
   }, [selectedDiscovery]);
 
   const flyToShip = () => {
-    if (globeRef.current) {
-      setIsAutoRotating(false);
-      globeRef.current.pointOfView(
-        {
-          lat: shipPosition.lat,
-          lng: shipPosition.lng,
-          altitude: 1.25
-        },
-        1100
+    centerGlobeOnLatLng(shipPosition.lat, shipPosition.lng);
+  };
+
+  const handleZoom = (delta: number) => {
+    if (cameraRef.current) {
+      cameraRef.current.position.z = Math.max(
+        175,
+        Math.min(360, cameraRef.current.position.z + delta)
       );
     }
   };
 
-  // Combine hometown pins + the Cruise Ship marker
-  const pointsData = [
-    ...discoveries.map(d => ({
-      id: d.id,
-      lat: d.lat,
-      lng: d.lng,
-      size: selectedDiscovery?.id === d.id ? 0.85 : 0.55,
-      color: selectedDiscovery?.id === d.id ? '#FFC83B' : '#00E5C3',
-      label: `${d.city}, ${d.country} (${d.duckId})`,
-      isShip: false,
-      discovery: d
-    })),
-    {
-      id: 'caribbean_cruise_ship',
-      lat: shipPosition.lat,
-      lng: shipPosition.lng,
-      size: 1.05,
-      color: '#FF7A59',
-      label: `🚢 CRUISE SHIP: ${shipPosition.name}`,
-      isShip: true,
-      discovery: null
-    }
-  ];
+  useEffect(() => {
+    const container = mountRef.current;
+    if (!container) return;
 
-  // Flight arcs from every finder's hometown to the Cruise Ship in the Caribbean Sea
-  const arcsData = discoveries.map(d => ({
-    startLat: d.lat,
-    startLng: d.lng,
-    endLat: shipPosition.lat,
-    endLng: shipPosition.lng,
-    color: selectedDiscovery?.id === d.id ? ['#FFC83B', '#FF7A59'] : ['#00E5C3', '#FFC83B'],
-    discovery: d
-  }));
+    const width = container.clientWidth || 780;
+    const height = container.clientHeight || 490;
+
+    // 1. Initialize Three.js Scene, Camera, & WebGLRenderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, width / height, 1, 1500);
+    camera.position.set(0, 0, 265);
+    cameraRef.current = camera;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.innerHTML = '';
+    container.appendChild(renderer.domElement);
+
+    // 2. Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.15);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0x00f2d4, 1.35);
+    dirLight1.position.set(220, 180, 240);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0xffc83b, 0.85);
+    dirLight2.position.set(-200, -140, 180);
+    scene.add(dirLight2);
+
+    // 3. Starfield Background
+    const starsGeo = new THREE.BufferGeometry();
+    const starCount = 420;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+      starPositions[i] = (Math.random() - 0.5) * 900;
+      starPositions[i + 1] = (Math.random() - 0.5) * 700;
+      starPositions[i + 2] = -150 - Math.random() * 350;
+    }
+    starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starsMat = new THREE.PointsMaterial({
+      color: 0x9dc4dc,
+      size: 1.5,
+      transparent: true,
+      opacity: 0.65
+    });
+    const starField = new THREE.Points(starsGeo, starsMat);
+    scene.add(starField);
+
+    // 4. Master Globe Group (rotates Earth + Pins + Arcs together)
+    const globeGroup = new THREE.Group();
+    globeGroup.rotation.x = targetRotationRef.current.x;
+    globeGroup.rotation.y = targetRotationRef.current.y;
+    globeGroupRef.current = globeGroup;
+    scene.add(globeGroup);
+
+    // 5. 3D Earth Sphere with High-Resolution Vector World Map Canvas Texture
+    const earthGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+    const earthTexture = createWorldGlobeTexture();
+    const earthMat = new THREE.MeshPhongMaterial({
+      map: earthTexture,
+      specular: new THREE.Color(0x00d2b8),
+      shininess: 18
+    });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    globeGroup.add(earthMesh);
+
+    // 6. Outer Atmospheric Glow Halo Sphere
+    const atmosGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.035, 64, 64);
+    const atmosMat = new THREE.MeshBasicMaterial({
+      color: 0x00e5c3,
+      transparent: true,
+      opacity: 0.11,
+      side: THREE.BackSide
+    });
+    const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+    globeGroup.add(atmosMesh);
+
+    // 7. Build 3D Pins, Surface Halos, & Great-Circle Flight Arcs to Caribbean Ship
+    const pinsGroup = new THREE.Group();
+    globeGroup.add(pinsGroup);
+
+    const shipVec = latLngToVector3(shipPosition.lat, shipPosition.lng, GLOBE_RADIUS);
+
+    // Add 3D Marker for the Cruise Ship in the Caribbean Sea
+    const shipPinGroup = new THREE.Group();
+    const shipNormal = shipVec.clone().normalize();
+    const shipTopVec = shipNormal.clone().multiplyScalar(GLOBE_RADIUS + 8);
+
+    const shipStemGeo = new THREE.BufferGeometry().setFromPoints([shipVec, shipTopVec]);
+    const shipStemMat = new THREE.LineBasicMaterial({ color: 0xff7a59, linewidth: 3 });
+    shipPinGroup.add(new THREE.Line(shipStemGeo, shipStemMat));
+
+    const shipHeadGeo = new THREE.SphereGeometry(3.2, 16, 16);
+    const shipHeadMat = new THREE.MeshBasicMaterial({ color: 0xff7a59 });
+    const shipHeadMesh = new THREE.Mesh(shipHeadGeo, shipHeadMat);
+    shipHeadMesh.position.copy(shipTopVec);
+    shipPinGroup.add(shipHeadMesh);
+    pinsGroup.add(shipPinGroup);
+
+    // Add 3D Pins + Flight Arcs for all Discoveries
+    discoveries.forEach(d => {
+      const isSelected = selectedDiscovery?.id === d.id;
+      const startVec = latLngToVector3(d.lat, d.lng, GLOBE_RADIUS);
+      const normal = startVec.clone().normalize();
+      const pinTopVec = normal.clone().multiplyScalar(GLOBE_RADIUS + (isSelected ? 9.5 : 6.5));
+
+      // Pin Stem
+      const stemGeo = new THREE.BufferGeometry().setFromPoints([startVec, pinTopVec]);
+      const stemMat = new THREE.LineBasicMaterial({
+        color: isSelected ? 0xffc83b : 0x00f2d4,
+        linewidth: 2
+      });
+      pinsGroup.add(new THREE.Line(stemGeo, stemMat));
+
+      // Glowing Pin Head Sphere
+      const headGeo = new THREE.SphereGeometry(isSelected ? 2.8 : 2.0, 14, 14);
+      const headMat = new THREE.MeshBasicMaterial({
+        color: isSelected ? 0xffc83b : 0x00f2d4
+      });
+      const headMesh = new THREE.Mesh(headGeo, headMat);
+      headMesh.position.copy(pinTopVec);
+      pinsGroup.add(headMesh);
+
+      // 3D Flight Arc from Finder's Hometown to Caribbean Cruise Ship
+      const midPoint = startVec
+        .clone()
+        .add(shipVec)
+        .multiplyScalar(0.5);
+      const dist = startVec.distanceTo(shipVec);
+      const arcAltitude = GLOBE_RADIUS + Math.max(16, dist * 0.28);
+      midPoint.normalize().multiplyScalar(arcAltitude);
+
+      const curve = new THREE.QuadraticBezierCurve3(startVec, midPoint, shipVec);
+      const curvePoints = curve.getPoints(44);
+      const arcGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
+      const arcMat = new THREE.LineBasicMaterial({
+        color: isSelected ? 0xffc83b : 0x00d2b8,
+        transparent: true,
+        opacity: isSelected ? 0.95 : 0.45
+      });
+      pinsGroup.add(new THREE.Line(arcGeo, arcMat));
+    });
+
+    // 8. Pointer / Touch Interactive Rotation & Zoom Listeners
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      isDraggingRef.current = true;
+      setIsAutoRotating(false);
+      isAutoRotatingRef.current = false;
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      previousMouseRef.current = { x: clientX, y: clientY };
+    };
+
+    const onPointerMove = (e: MouseEvent | TouchEvent) => {
+      if (!isDraggingRef.current || !globeGroupRef.current) return;
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const deltaX = clientX - previousMouseRef.current.x;
+      const deltaY = clientY - previousMouseRef.current.y;
+
+      targetRotationRef.current.y += deltaX * 0.0065;
+      targetRotationRef.current.x = Math.max(
+        -1.1,
+        Math.min(1.1, targetRotationRef.current.x + deltaY * 0.0065)
+      );
+      globeGroupRef.current.rotation.y = targetRotationRef.current.y;
+      globeGroupRef.current.rotation.x = targetRotationRef.current.x;
+      previousMouseRef.current = { x: clientX, y: clientY };
+    };
+
+    const onPointerUp = () => {
+      isDraggingRef.current = false;
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      camera.position.z = Math.max(175, Math.min(360, camera.position.z + e.deltaY * 0.14));
+    };
+
+    const domElem = renderer.domElement;
+    domElem.addEventListener('mousedown', onPointerDown);
+    domElem.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+    domElem.addEventListener('touchstart', onPointerDown, { passive: true });
+    domElem.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
+    domElem.addEventListener('wheel', onWheel, { passive: false });
+
+    // 9. Animation Loop + 3D-to-2D Projected City Labels
+    let animFrameId: number;
+    let frameCounter = 0;
+
+    const animate = () => {
+      animFrameId = requestAnimationFrame(animate);
+
+      if (globeGroupRef.current) {
+        if (isAutoRotatingRef.current && !isDraggingRef.current) {
+          targetRotationRef.current.y += 0.0028;
+        }
+        // Smooth damping interpolation
+        globeGroupRef.current.rotation.y +=
+          (targetRotationRef.current.y - globeGroupRef.current.rotation.y) * 0.09;
+        globeGroupRef.current.rotation.x +=
+          (targetRotationRef.current.x - globeGroupRef.current.rotation.x) * 0.09;
+      }
+
+      renderer.render(scene, camera);
+
+      // Update projected HTML city pin badges every 3 frames for smooth 60fps UI
+      frameCounter++;
+      if (frameCounter % 3 === 0 && globeGroupRef.current && container) {
+        const currentW = container.clientWidth || width;
+        const currentH = container.clientHeight || height;
+        const cameraDir = camera.position.clone().normalize();
+
+        const newOverlays: ProjectedPinOverlay[] = [];
+
+        // Project Cruise Ship Marker
+        const shipWorldPos = latLngToVector3(shipPosition.lat, shipPosition.lng, GLOBE_RADIUS + 8);
+        shipWorldPos.applyEuler(globeGroupRef.current.rotation);
+        const shipSurfaceNormal = shipWorldPos.clone().normalize();
+        const shipVisible = shipSurfaceNormal.dot(cameraDir) > 0.18;
+
+        if (shipVisible) {
+          const projected = shipWorldPos.clone().project(camera);
+          newOverlays.push({
+            id: 'caribbean_cruise_ship',
+            label: '🚢 Cruise Ship',
+            sublabel: 'Caribbean Sea',
+            x: ((projected.x + 1) * currentW) / 2,
+            y: ((-projected.y + 1) * currentH) / 2,
+            visible: true,
+            isShip: true,
+            isSelected: false,
+            discovery: null
+          });
+        }
+
+        // Project Hometown Discovery Pins
+        discoveries.forEach(d => {
+          const pinWorldPos = latLngToVector3(d.lat, d.lng, GLOBE_RADIUS + 7);
+          pinWorldPos.applyEuler(globeGroupRef.current!.rotation);
+          const pinNormal = pinWorldPos.clone().normalize();
+          const isVisible = pinNormal.dot(cameraDir) > 0.22;
+
+          if (isVisible) {
+            const projected = pinWorldPos.clone().project(camera);
+            newOverlays.push({
+              id: d.id,
+              label: `${d.city}`,
+              sublabel: d.duckId,
+              x: ((projected.x + 1) * currentW) / 2,
+              y: ((-projected.y + 1) * currentH) / 2,
+              visible: true,
+              isShip: false,
+              isSelected: selectedDiscovery?.id === d.id,
+              discovery: d
+            });
+          }
+        });
+
+        setProjectedOverlays(newOverlays);
+      }
+    };
+
+    animate();
+
+    const handleResize = () => {
+      if (!container) return;
+      const newW = container.clientWidth || 780;
+      const newH = container.clientHeight || 490;
+      camera.aspect = newW / newH;
+      camera.updateProjectionMatrix();
+      renderer.setSize(newW, newH);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      cancelAnimationFrame(animFrameId);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mouseup', onPointerUp);
+      window.removeEventListener('touchend', onPointerUp);
+      domElem.removeEventListener('mousedown', onPointerDown);
+      domElem.removeEventListener('mousemove', onPointerMove);
+      domElem.removeEventListener('touchstart', onPointerDown);
+      domElem.removeEventListener('touchmove', onPointerMove);
+      domElem.removeEventListener('wheel', onWheel);
+      renderer.dispose();
+    };
+  }, [discoveries, shipPosition, selectedDiscovery]);
 
   return (
-    <div className="globe-wrapper" ref={containerRef}>
+    <div className="globe-wrapper">
+      {/* Top Left Interactive Globe Controls */}
       <div className="globe-controls-overlay">
         <button
           type="button"
@@ -141,58 +394,76 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
           <Ship size={15} />
           <span>Center on Cruise Ship</span>
         </button>
+
+        <button
+          type="button"
+          className="globe-control-btn"
+          onClick={() => handleZoom(-28)}
+          title="Zoom In"
+        >
+          <ZoomIn size={15} />
+        </button>
+
+        <button
+          type="button"
+          className="globe-control-btn"
+          onClick={() => handleZoom(28)}
+          title="Zoom Out"
+        >
+          <ZoomOut size={15} />
+        </button>
       </div>
 
+      {/* Top Right Legend */}
       <div className="globe-legend-pill">
         <span className="legend-item">
-          <span className="legend-dot dot-hometown" /> Finder Hometown
+          <span className="legend-dot dot-hometown" /> Finder Hometown Pin
         </span>
         <span className="legend-item">
           <span className="legend-dot dot-ship" /> Caribbean Cruise Ship
         </span>
       </div>
 
-      <Globe
-        ref={globeRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        backgroundColor="rgba(0,0,0,0)"
-        globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-        bumpImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
-        atmosphereColor="#00D2B8"
-        atmosphereAltitude={0.18}
-        pointsData={pointsData}
-        pointLat="lat"
-        pointLng="lng"
-        pointColor="color"
-        pointAltitude={0.035}
-        pointRadius="size"
-        pointLabel="label"
-        onPointClick={(pt: any) => {
-          if (pt && pt.discovery) {
-            onSelectDiscovery(pt.discovery);
-          } else if (pt && pt.isShip) {
-            flyToShip();
-          }
-        }}
-        arcsData={arcsData}
-        arcStartLat="startLat"
-        arcStartLng="startLng"
-        arcEndLat="endLat"
-        arcEndLng="endLng"
-        arcColor="color"
-        arcDashLength={0.45}
-        arcDashGap={0.2}
-        arcDashAnimateTime={2200}
-        arcStroke={0.65}
-      />
+      {/* 3D WebGL Canvas Mount Point */}
+      <div ref={mountRef} className="globe-canvas-mount" />
 
+      {/* 3D Projected Interactive City Pin Badges */}
+      <div className="globe-projected-pins-layer">
+        {projectedOverlays.map(pin => (
+          <button
+            key={pin.id}
+            type="button"
+            className={`projected-pin-badge ${pin.isShip ? 'pin-badge-ship' : ''} ${
+              pin.isSelected ? 'pin-badge-selected' : ''
+            }`}
+            style={{
+              left: `${pin.x}px`,
+              top: `${pin.y}px`
+            }}
+            onClick={() => {
+              if (pin.discovery) {
+                onSelectDiscovery(pin.discovery);
+              } else if (pin.isShip) {
+                flyToShip();
+              }
+            }}
+          >
+            <span className="pin-badge-dot" />
+            <span className="pin-badge-text">{pin.label}</span>
+            {pin.sublabel && <span className="pin-badge-sub">{pin.sublabel}</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* Bottom Selected Pin Details Card */}
       {selectedDiscovery && (
         <div className="selected-pin-floating-card">
           <div className="selected-pin-header">
             <div className="selected-pin-badge">
               <Sparkles size={14} />
-              <span>{selectedDiscovery.duckId}: {selectedDiscovery.duckName}</span>
+              <span>
+                {selectedDiscovery.duckId}: {selectedDiscovery.duckName}
+              </span>
             </div>
             <span className="selected-pin-miles">
               <Navigation size={13} /> {selectedDiscovery.distanceMilesToShip.toLocaleString()} miles to ship
@@ -200,12 +471,15 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
           </div>
           <div className="selected-pin-location">
             <MapPin size={16} className="pin-icon" />
-            <strong>{selectedDiscovery.city}{selectedDiscovery.region ? `, ${selectedDiscovery.region}` : ''}</strong>
+            <strong>
+              {selectedDiscovery.city}
+              {selectedDiscovery.region ? `, ${selectedDiscovery.region}` : ''}
+            </strong>
             <span className="country-tag">{selectedDiscovery.country}</span>
           </div>
           <p className="selected-pin-note">"{selectedDiscovery.note}"</p>
           <div className="selected-pin-footer">
-            <span>Found on: {selectedDiscovery.deckFound}</span>
+            <span>📍 Found on: {selectedDiscovery.deckFound}</span>
             <span>{new Date(selectedDiscovery.createdAt).toLocaleDateString()}</span>
           </div>
         </div>

@@ -351,6 +351,91 @@ body {
   background: radial-gradient(circle at 50% 50%, #09314B 0%, #031522 85%);
   overflow: hidden;
   border: 1px solid rgba(0, 210, 184, 0.22);
+  user-select: none;
+}
+
+.globe-canvas-mount {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.globe-canvas-mount:active {
+  cursor: grabbing;
+}
+
+.globe-projected-pins-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.projected-pin-badge {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0.24rem 0.58rem;
+  border-radius: 99px;
+  background: rgba(3, 21, 34, 0.88);
+  border: 1px solid rgba(0, 242, 212, 0.65);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.projected-pin-badge:hover {
+  transform: translate(-50%, -105%) scale(1.08);
+  background: #00d2b8;
+  color: #021822;
+  z-index: 20;
+}
+
+.pin-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00f2d4;
+  box-shadow: 0 0 6px #00f2d4;
+}
+
+.pin-badge-ship {
+  background: linear-gradient(135deg, #ff7a59, #ffc83b);
+  color: #031522;
+  border-color: #ffffff;
+  font-weight: 800;
+  z-index: 15;
+}
+
+.pin-badge-ship .pin-badge-dot {
+  background: #031522;
+  box-shadow: none;
+}
+
+.pin-badge-selected {
+  background: #ffc83b;
+  color: #031522;
+  border-color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 200, 59, 0.85);
+  z-index: 18;
+}
+
+.pin-badge-selected .pin-badge-dot {
+  background: #031522;
+}
+
+.pin-badge-sub {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  opacity: 0.82;
+  margin-left: 0.15rem;
 }
 
 .globe-controls-overlay {
