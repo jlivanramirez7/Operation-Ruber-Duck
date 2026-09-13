@@ -1,0 +1,57 @@
+# Google Cloud Build CI/CD Pipeline for CruiseDuck Tracker ("Operation Rubber Duck")
+# Automatically executes database/API persistence tests, containerizes, and deploys to Cloud Run.
+steps:
+  # 1. Build multi-stage production container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/cruiseduck-tracker:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/cruiseduck-tracker:latest'
+      - '.'
+
+  # 2. Run automated server/database persistence & anti-spam verification test suite
+  - name: 'gcr.io/$PROJECT_ID/cruiseduck-tracker:$COMMIT_SHA'
+    entrypoint: 'node'
+    args: ['tests/databaseAndApi.test.js']
+
+  # 3. Push container image to Artifact Registry / Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/cruiseduck-tracker:$COMMIT_SHA'
+
+  # 4. Deploy to Google Cloud Run connected to Cloud Firestore (operationruberduck-db)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'cruiseduck-tracker'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/cruiseduck-tracker:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '4'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--set-env-vars'
+      - 'GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GCP_PROJECT_ID=$PROJECT_ID,FIRESTORE_DATABASE_ID=operationruberduck-db,NODE_ENV=production'
+
+images:
+  - 'gcr.io/$PROJECT_ID/cruiseduck-tracker:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/cruiseduck-tracker:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

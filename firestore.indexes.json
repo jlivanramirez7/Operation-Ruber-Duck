@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "discoveries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "duckId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "discoveries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

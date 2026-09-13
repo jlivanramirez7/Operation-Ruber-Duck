@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public read access for real-time 3D globe pins and leaderboard
+    match /ducks/{duckId} {
+      allow read: if true;
+      allow write: if false; // Writes mediated via Cloud Run backend service account
+    }
+
+    match /discoveries/{discoveryId} {
+      allow read: if true;
+      // Direct client writes blocked; all submissions validated through Cloud Run Anti-Spam API
+      allow write: if false;
+    }
+
+    match /rate_limits/{fingerprintHash} {
+      allow read, write: if false; // Internal server-only collection
+    }
+
+    match /_system_health/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

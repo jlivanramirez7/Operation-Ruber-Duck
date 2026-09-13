@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production builds
+client/dist/
+server/public/
+
+# Environment & secrets
+.env
+.env.local
+.env.production
+*.key.json
+service-account*.json
+
+# OS & Editor files
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/
+.idea/

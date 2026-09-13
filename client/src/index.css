@@ -1,0 +1,1179 @@
+:root {
+  --ocean-deep: #031522;
+  --ocean-sapphire: #07283D;
+  --ocean-mid: #0C3B59;
+  --turquoise-glow: #00D2B8;
+  --turquoise-bright: #00F2D4;
+  --sunset-gold: #FFC83B;
+  --coral-accent: #FF7A59;
+  --text-light: #F4FAFF;
+  --text-muted: #9DC4DC;
+  --card-glass: rgba(8, 38, 60, 0.78);
+  --card-border: rgba(0, 210, 184, 0.28);
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: radial-gradient(circle at 50% 0%, #0C4A6E 0%, #052236 45%, #02121D 100%);
+  color: var(--text-light);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================================
+   CARIBBEAN NAVBAR
+   ============================================================================ */
+.caribbean-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.75rem;
+  background: rgba(3, 21, 34, 0.88);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.brand-logo-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--sunset-gold), var(--coral-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  box-shadow: 0 4px 16px rgba(255, 200, 59, 0.35);
+}
+
+.brand-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--turquoise-bright);
+  text-transform: uppercase;
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.db-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 0.75rem;
+  border-radius: 99px;
+  background: rgba(0, 210, 184, 0.14);
+  border: 1px solid rgba(0, 210, 184, 0.4);
+  color: var(--turquoise-bright);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.nav-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.52rem 0.95rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.nav-btn-found-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--turquoise-glow), #00A896);
+  border: none;
+  color: #021822;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 210, 184, 0.35);
+  transition: all 0.2s ease;
+}
+
+.nav-btn-found-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(0, 242, 212, 0.5);
+}
+
+/* ============================================================================
+   HERO & FARTHEST TRAVELER BANNER
+   ============================================================================ */
+.caribbean-main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.4rem 1.5rem 3rem;
+}
+
+.caribbean-hero-banner {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.4rem;
+  background: linear-gradient(135deg, rgba(12, 59, 89, 0.72), rgba(5, 28, 44, 0.85));
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.32rem 0.8rem;
+  border-radius: 99px;
+  background: rgba(255, 200, 59, 0.16);
+  border: 1px solid rgba(255, 200, 59, 0.45);
+  color: var(--sunset-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.65rem;
+}
+
+.hero-headline {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.22;
+  margin-bottom: 0.55rem;
+  color: #ffffff;
+}
+
+.hero-subtext {
+  font-size: 0.94rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 1.1rem;
+}
+
+.hero-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.btn-caribbean-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.35rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--sunset-gold), var(--coral-accent));
+  border: none;
+  color: #041826;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 122, 89, 0.38);
+  transition: all 0.2s ease;
+}
+
+.btn-caribbean-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(255, 200, 59, 0.52);
+}
+
+.btn-glass-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 12px;
+  background: rgba(0, 210, 184, 0.1);
+  border: 1px solid rgba(0, 210, 184, 0.45);
+  color: var(--turquoise-bright);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-glass-outline:hover {
+  background: rgba(0, 210, 184, 0.2);
+}
+
+.farthest-traveler-card {
+  background: linear-gradient(135deg, rgba(255, 200, 59, 0.14), rgba(255, 122, 89, 0.12));
+  border: 1px solid rgba(255, 200, 59, 0.42);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.trophy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--sunset-gold);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.45rem;
+}
+
+.farthest-city {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.farthest-miles {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--turquoise-bright);
+  margin: 0.25rem 0;
+}
+
+.farthest-duck {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   3D SPINNING GLOBE & LIVE FEED GRID
+   ============================================================================ */
+.globe-and-feed-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.25rem;
+}
+
+.globe-panel-card,
+.feed-panel-card {
+  background: var(--card-glass);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.panel-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.panel-title-group h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.turquoise-icon {
+  color: var(--turquoise-bright);
+}
+
+.gold-icon {
+  color: var(--sunset-gold);
+}
+
+.ship-coord-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 99px;
+  background: rgba(255, 122, 89, 0.16);
+  color: #FFB09C;
+  border: 1px solid rgba(255, 122, 89, 0.35);
+}
+
+.globe-wrapper {
+  position: relative;
+  width: 100%;
+  height: 490px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 50%, #09314B 0%, #031522 85%);
+  overflow: hidden;
+  border: 1px solid rgba(0, 210, 184, 0.22);
+}
+
+.globe-controls-overlay {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  z-index: 10;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.globe-control-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.75rem;
+  border-radius: 9px;
+  background: rgba(3, 21, 34, 0.82);
+  border: 1px solid rgba(0, 210, 184, 0.35);
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.globe-control-btn:hover {
+  background: rgba(0, 210, 184, 0.22);
+}
+
+.globe-legend-pill {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 10;
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 99px;
+  background: rgba(3, 21, 34, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.74rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.dot-hometown {
+  background: var(--turquoise-bright);
+  box-shadow: 0 0 8px var(--turquoise-bright);
+}
+
+.dot-ship {
+  background: var(--coral-accent);
+  box-shadow: 0 0 8px var(--coral-accent);
+}
+
+.selected-pin-floating-card {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 0.85rem;
+  right: 0.85rem;
+  z-index: 10;
+  background: rgba(3, 21, 34, 0.92);
+  border: 1px solid rgba(255, 200, 59, 0.55);
+  border-radius: 14px;
+  padding: 0.85rem 1.05rem;
+  backdrop-filter: blur(12px);
+}
+
+.selected-pin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.selected-pin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--sunset-gold);
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.selected-pin-miles {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--turquoise-bright);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.selected-pin-location {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.country-tag {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.selected-pin-note {
+  font-size: 0.88rem;
+  color: #E2F2FF;
+  font-style: italic;
+  margin-bottom: 0.3rem;
+}
+
+.selected-pin-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   TELEMETRY KPI STRIP & LIVE FEED CARDS
+   ============================================================================ */
+.telemetry-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.95rem;
+}
+
+.kpi-box {
+  background: rgba(3, 21, 34, 0.65);
+  border: 1px solid rgba(0, 210, 184, 0.22);
+  border-radius: 12px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.kpi-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--sunset-gold);
+}
+
+.kpi-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.discoveries-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 550px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.discovery-feed-card {
+  background: rgba(3, 21, 34, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.discovery-feed-card:hover {
+  background: rgba(12, 59, 89, 0.65);
+  border-color: var(--turquoise-glow);
+  transform: translateX(2px);
+}
+
+.feed-card-active {
+  background: rgba(12, 59, 89, 0.82);
+  border-color: var(--sunset-gold);
+  box-shadow: 0 0 16px rgba(255, 200, 59, 0.25);
+}
+
+.feed-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.feed-duck-pill {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--sunset-gold);
+}
+
+.feed-miles-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.74rem;
+  color: var(--turquoise-bright);
+  font-weight: 700;
+}
+
+.feed-card-hometown {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+
+.feed-country {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.feed-card-note {
+  font-size: 0.85rem;
+  color: #E5F4FF;
+  line-height: 1.4;
+  margin-bottom: 0.45rem;
+}
+
+.feed-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.feed-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #4AE290;
+  font-weight: 600;
+}
+
+/* ============================================================================
+   MODALS (SUBMISSION, CATALOG, QR TAG STUDIO)
+   ============================================================================ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(2, 12, 20, 0.82);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.caribbean-modal {
+  background: linear-gradient(145deg, #07283D, #031522);
+  border: 1px solid rgba(0, 210, 184, 0.45);
+  border-radius: 22px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.55);
+}
+
+.catalog-modal,
+.tag-studio-modal {
+  max-width: 960px;
+}
+
+.modal-header-tropical {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.15rem;
+}
+
+.modal-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--sunset-gold);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-light);
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.duck-id-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: rgba(0, 210, 184, 0.12);
+  border: 1px solid rgba(0, 210, 184, 0.38);
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.duck-id-icon {
+  font-size: 1.85rem;
+}
+
+.duck-id-details {
+  flex: 1;
+}
+
+.duck-select-label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--turquoise-bright);
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.duck-select-input {
+  width: 100%;
+  background: rgba(3, 21, 34, 0.85);
+  border: 1px solid rgba(0, 210, 184, 0.35);
+  color: #ffffff;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.verified-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 99px;
+  background: rgba(74, 226, 144, 0.18);
+  color: #4AE290;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.form-group {
+  margin-bottom: 1.05rem;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-counter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.tropical-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 11px;
+  background: rgba(3, 21, 34, 0.82);
+  border: 1px solid rgba(0, 210, 184, 0.35);
+  color: #ffffff;
+  font-size: 0.92rem;
+  outline: none;
+}
+
+.tropical-input:focus {
+  border-color: var(--sunset-gold);
+  box-shadow: 0 0 0 3px rgba(255, 200, 59, 0.2);
+}
+
+.city-suggestions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+.city-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--text-light);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.city-chip:hover {
+  background: rgba(0, 210, 184, 0.2);
+  border-color: var(--turquoise-bright);
+}
+
+.city-chip-selected {
+  background: linear-gradient(135deg, var(--turquoise-glow), #00A896);
+  color: #021822;
+  font-weight: 700;
+  border-color: transparent;
+}
+
+.custom-town-box {
+  margin-top: 0.65rem;
+  padding: 0.75rem;
+  background: rgba(3, 21, 34, 0.7);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 200, 59, 0.45);
+}
+
+.custom-town-hint {
+  font-size: 0.78rem;
+  color: var(--sunset-gold);
+  margin-bottom: 0.45rem;
+}
+
+.custom-town-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lookup-btn {
+  padding: 0.6rem 0.95rem;
+  border-radius: 10px;
+  background: var(--sunset-gold);
+  border: none;
+  color: #041826;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.privacy-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(0, 210, 184, 0.09);
+  border: 1px solid rgba(0, 210, 184, 0.25);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.privacy-icon {
+  color: var(--turquoise-bright);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.form-error-alert {
+  padding: 0.75rem 0.95rem;
+  border-radius: 10px;
+  background: rgba(255, 92, 92, 0.18);
+  border: 1px solid rgba(255, 92, 92, 0.5);
+  color: #FFB4B4;
+  font-size: 0.84rem;
+  margin-bottom: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-secondary {
+  padding: 0.7rem 1.2rem;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-light);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   DUCK FLEET ROSTER & WATERPROOF QR TAG STUDIO
+   ============================================================================ */
+.catalog-toolbar {
+  display: flex;
+  gap: 0.85rem;
+  margin-bottom: 1.15rem;
+  flex-wrap: wrap;
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.search-input-wrap .tropical-input {
+  padding-left: 2.35rem;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.filter-tab {
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-light);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-tab.active {
+  background: var(--sunset-gold);
+  color: #041826;
+  border-color: transparent;
+}
+
+.duck-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.9rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.duck-roster-card {
+  background: rgba(3, 21, 34, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 1.05rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.duck-found {
+  border-color: rgba(255, 200, 59, 0.45);
+}
+
+.duck-roster-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.duck-id-pill {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--turquoise-bright);
+}
+
+.find-count-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 99px;
+}
+
+.badge-gold {
+  background: rgba(255, 200, 59, 0.18);
+  color: var(--sunset-gold);
+}
+
+.badge-sea {
+  background: rgba(0, 210, 184, 0.14);
+  color: var(--turquoise-bright);
+}
+
+.duck-roster-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+}
+
+.duck-roster-theme {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.duck-roster-meta {
+  font-size: 0.76rem;
+  color: #D2EBFF;
+  margin-bottom: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.meta-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-log-this-duck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.55rem;
+  border-radius: 10px;
+  background: rgba(0, 210, 184, 0.15);
+  border: 1px solid rgba(0, 210, 184, 0.4);
+  color: var(--turquoise-bright);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-log-this-duck:hover {
+  background: var(--turquoise-glow);
+  color: #021822;
+}
+
+/* Printable Waterproof QR Tag Sheet */
+.tag-studio-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.tag-spec-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.tag-studio-actions {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.tag-count-select {
+  width: 170px;
+}
+
+.printable-tag-sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.waterproof-tag-card {
+  position: relative;
+  background: #ffffff;
+  color: #041826;
+  border: 3px solid #00A896;
+  border-radius: 18px;
+  padding: 0.85rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.tag-hole-punch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #041826;
+  background: #E2F2FF;
+  margin-bottom: 0.35rem;
+}
+
+.tag-card-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.4rem;
+}
+
+.tag-ahoy {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #007A6E;
+}
+
+.tag-duck-id {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #041826;
+}
+
+.tag-qr-box {
+  background: #ffffff;
+  padding: 0.35rem;
+  border-radius: 10px;
+  border: 1px solid #D0E6F5;
+  margin-bottom: 0.45rem;
+}
+
+.tag-qr-img {
+  width: 125px;
+  height: 125px;
+  display: block;
+}
+
+.tag-duck-name {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #041826;
+}
+
+.tag-call-to-action {
+  font-size: 0.72rem;
+  color: #204B66;
+  line-height: 1.25;
+  margin: 0.2rem 0;
+}
+
+.tag-signature {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: #6B8B9E;
+}
+
+/* Print Stylesheet for Physical Waterproof Tags */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .caribbean-navbar,
+  .caribbean-main,
+  .no-print {
+    display: none !important;
+  }
+  .modal-backdrop {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+  .caribbean-modal {
+    max-width: 100% !important;
+    max-height: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .printable-tag-sheet {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 960px) {
+  .caribbean-hero-banner,
+  .globe-and-feed-grid {
+    grid-template-columns: 1fr;
+  }
+  .telemetry-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .globe-wrapper {
+    height: 390px;
+  }
+}
