@@ -192,32 +192,18 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          {/* Step 1: Duck Badge (Compact Pictographic Pill) */}
+          {/* Step 1: Locked Duck Identity Badge (Dictated strictly by QR Code) */}
           <div className="duck-id-banner">
             <div className="duck-id-icon">🦆</div>
             <div className="duck-id-details">
-              <label htmlFor="duckIdSelect" className="duck-select-label">
-                ① Duck Found
-              </label>
-              <select
-                id="duckIdSelect"
-                className="duck-select-input"
-                value={selectedDuckId}
-                onChange={e => setSelectedDuckId(e.target.value)}
-                aria-label="Select Cruise Duck ID"
-              >
-                {ducks.map(d => (
-                  <option key={d.duckId} value={d.duckId}>
-                    {d.duckId} • {d.name}
-                  </option>
-                ))}
-              </select>
+              <span className="duck-select-label">① Duck Scanned</span>
+              <div className="duck-locked-title">
+                {activeDuck.duckId} • {activeDuck.name}
+              </div>
             </div>
-            {initialSignature && (
-              <span className="verified-tag-pill" title="Authentic Waterproof QR Tag Scanned">
-                <ShieldCheck size={14} /> ✓ QR
-              </span>
-            )}
+            <span className="verified-tag-pill" title="Authentic Waterproof QR Tag Scanned">
+              <ShieldCheck size={14} /> ✓ QR Tag
+            </span>
           </div>
 
           {/* Step 2: Hometown City Picker */}
@@ -301,7 +287,16 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
               </span>
             </div>
 
-            {/* 1-Tap Emoji Mood Chips */}
+            <input
+              type="text"
+              maxLength={90}
+              className="tropical-input"
+              placeholder="✍️ Max 10 words (e.g. Found hiding by the soft serve ice cream machine! 🍦)"
+              value={note}
+              onChange={e => handleNoteChange(e.target.value)}
+            />
+
+            {/* 1-Tap Emoji Mood Chips (Under text box to mirror Hometown City layout) */}
             <div className="quick-vibe-chips">
               {QUICK_VIBE_NOTES.map(v => (
                 <button
@@ -315,15 +310,6 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
                 </button>
               ))}
             </div>
-
-            <input
-              type="text"
-              maxLength={90}
-              className="tropical-input"
-              placeholder="✍️ Max 10 words (e.g. Found hiding by the soft serve ice cream machine! 🍦)"
-              value={note}
-              onChange={e => handleNoteChange(e.target.value)}
-            />
           </div>
 
           {/* Micro-Trust Badge (Zero Reading Fatigue) */}

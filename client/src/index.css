@@ -1374,7 +1374,15 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-bottom: 0.55rem;
+  margin-top: 0.65rem;
+}
+
+.duck-locked-title {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-top: 0.15rem;
 }
 
 .vibe-chip-btn {
@@ -1400,22 +1408,6 @@ body {
 .word-limit-reached {
   color: var(--sunset-gold) !important;
   font-weight: 800;
-}
-
-.gemini-shield-row {
-  margin-top: 0.45rem;
-}
-
-.gemini-shield-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.75rem;
-  color: var(--turquoise-bright);
-  background: rgba(0, 210, 184, 0.1);
-  border: 1px solid rgba(0, 210, 184, 0.25);
-  border-radius: 999px;
-  padding: 0.22rem 0.65rem;
 }
 
 .micro-trust-pill {
