@@ -53,7 +53,7 @@ function writeLocalJson(filePath, data) {
 
 class FirestoreService {
   constructor() {
-    this.projectId = process.env.GCP_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || 'operation-ruber-duck';
+    this.projectId = process.env.GCP_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || 'operationruberduck';
     this.databaseId = process.env.FIRESTORE_DATABASE_ID || 'operationruberduck-db';
     this.client = null;
     this.connected = false;

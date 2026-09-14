@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID || 'operation-ruber-duck' }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID || 'operationruberduck' }}
   REGION: us-central1
   SERVICE_NAME: cruiseduck-tracker
   FIRESTORE_DB: operationruberduck-db
@@ -66,5 +66,6 @@ jobs:
           env_vars: |
             GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}
             GCP_PROJECT_ID=${{ env.PROJECT_ID }}
+            GOOGLE_CLOUD_LOCATION=${{ env.REGION }}
             FIRESTORE_DATABASE_ID=${{ env.FIRESTORE_DB }}
             NODE_ENV=production

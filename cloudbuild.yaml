@@ -47,7 +47,7 @@ steps:
       - '--cpu'
       - '1'
       - '--set-env-vars'
-      - 'GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GCP_PROJECT_ID=$PROJECT_ID,FIRESTORE_DATABASE_ID=operationruberduck-db,NODE_ENV=production'
+      - 'GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GCP_PROJECT_ID=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1,FIRESTORE_DATABASE_ID=operationruberduck-db,NODE_ENV=production'
 
 images:
   - 'gcr.io/$PROJECT_ID/cruiseduck-tracker:$COMMIT_SHA'
