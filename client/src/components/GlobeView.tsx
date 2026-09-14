@@ -24,7 +24,25 @@ interface ProjectedPinOverlay {
   discovery: Discovery | null;
 }
 
-const GLOBE_RADIUS = 108;
+const GLOBE_RADIUS = 100;
+const CAMERA_FOV_DEG = 42;
+
+/**
+ * Computes the exact camera Z distance so that 100% of the 3D Earth sphere,
+ * outer atmospheric halo, and elevated polar pins fit comfortably inside the viewport
+ * with ~12% starry breathing room on all sides (desktop and mobile).
+ */
+function getIdealCameraZ(width: number, height: number): number {
+  const aspect = Math.max(0.45, width / Math.max(1, height));
+  const vFovRad = (CAMERA_FOV_DEG * Math.PI) / 180;
+  const halfVFov = vFovRad / 2;
+  const halfHFov = Math.atan(aspect * Math.tan(halfVFov));
+  const minHalfFov = Math.min(halfVFov, halfHFov);
+
+  // Include Earth radius (100) + atmosphere halo + pin heads + comfortable starry margin (1.26x)
+  const effectiveRadius = GLOBE_RADIUS * 1.26;
+  return Math.round(effectiveRadius / Math.sin(minHalfFov));
+}
 
 export const GlobeView: React.FC<GlobeViewProps> = ({
   discoveries,
@@ -72,8 +90,8 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
   const handleZoom = (delta: number) => {
     if (cameraRef.current) {
       cameraRef.current.position.z = Math.max(
-        180,
-        Math.min(360, cameraRef.current.position.z + delta)
+        200,
+        Math.min(480, cameraRef.current.position.z + delta)
       );
     }
   };
@@ -84,11 +102,12 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
 
     const width = container.clientWidth || 860;
     const height = container.clientHeight || 600;
+    const initialZ = getIdealCameraZ(width, height);
 
     // 1. Initialize Three.js Scene, Camera, & WebGLRenderer
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, width / height, 1, 1500);
-    camera.position.set(0, 0, 268);
+    const camera = new THREE.PerspectiveCamera(CAMERA_FOV_DEG, width / height, 1, 1800);
+    camera.position.set(0, 0, initialZ);
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -111,19 +130,19 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
 
     // 3. Starfield Background
     const starsGeo = new THREE.BufferGeometry();
-    const starCount = 520;
+    const starCount = 560;
     const starPositions = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount * 3; i += 3) {
-      starPositions[i] = (Math.random() - 0.5) * 1050;
-      starPositions[i + 1] = (Math.random() - 0.5) * 850;
-      starPositions[i + 2] = -160 - Math.random() * 400;
+      starPositions[i] = (Math.random() - 0.5) * 1150;
+      starPositions[i + 1] = (Math.random() - 0.5) * 900;
+      starPositions[i + 2] = -160 - Math.random() * 450;
     }
     starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
     const starsMat = new THREE.PointsMaterial({
       color: 0x9dc4dc,
       size: 1.6,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.72
     });
     const starField = new THREE.Points(starsGeo, starsMat);
     scene.add(starField);
@@ -147,11 +166,11 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
     globeGroup.add(earthMesh);
 
     // 6. Outer Atmospheric Glow Halo Sphere
-    const atmosGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.038, 64, 64);
+    const atmosGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.04, 64, 64);
     const atmosMat = new THREE.MeshBasicMaterial({
       color: 0x00e5c3,
       transparent: true,
-      opacity: 0.12,
+      opacity: 0.13,
       side: THREE.BackSide
     });
     const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
@@ -166,13 +185,13 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
     // Add 3D Marker for the Cruise Ship in the Caribbean Sea
     const shipPinGroup = new THREE.Group();
     const shipNormal = shipVec.clone().normalize();
-    const shipTopVec = shipNormal.clone().multiplyScalar(GLOBE_RADIUS + 9);
+    const shipTopVec = shipNormal.clone().multiplyScalar(GLOBE_RADIUS + 8);
 
     const shipStemGeo = new THREE.BufferGeometry().setFromPoints([shipVec, shipTopVec]);
     const shipStemMat = new THREE.LineBasicMaterial({ color: 0xff7a59, linewidth: 3 });
     shipPinGroup.add(new THREE.Line(shipStemGeo, shipStemMat));
 
-    const shipHeadGeo = new THREE.SphereGeometry(3.4, 16, 16);
+    const shipHeadGeo = new THREE.SphereGeometry(3.2, 16, 16);
     const shipHeadMat = new THREE.MeshBasicMaterial({ color: 0xff7a59 });
     const shipHeadMesh = new THREE.Mesh(shipHeadGeo, shipHeadMat);
     shipHeadMesh.position.copy(shipTopVec);
@@ -184,7 +203,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
       const isSelected = selectedDiscovery?.id === d.id;
       const startVec = latLngToVector3(d.lat, d.lng, GLOBE_RADIUS);
       const normal = startVec.clone().normalize();
-      const pinTopVec = normal.clone().multiplyScalar(GLOBE_RADIUS + (isSelected ? 10.5 : 7.2));
+      const pinTopVec = normal.clone().multiplyScalar(GLOBE_RADIUS + (isSelected ? 9.5 : 6.5));
 
       // Pin Stem
       const stemGeo = new THREE.BufferGeometry().setFromPoints([startVec, pinTopVec]);
@@ -195,7 +214,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
       pinsGroup.add(new THREE.Line(stemGeo, stemMat));
 
       // Glowing Pin Head Sphere
-      const headGeo = new THREE.SphereGeometry(isSelected ? 3.0 : 2.2, 14, 14);
+      const headGeo = new THREE.SphereGeometry(isSelected ? 2.8 : 2.0, 14, 14);
       const headMat = new THREE.MeshBasicMaterial({
         color: isSelected ? 0xffc83b : 0x00f2d4
       });
@@ -209,7 +228,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
         .add(shipVec)
         .multiplyScalar(0.5);
       const dist = startVec.distanceTo(shipVec);
-      const arcAltitude = GLOBE_RADIUS + Math.max(18, dist * 0.28);
+      const arcAltitude = GLOBE_RADIUS + Math.max(16, dist * 0.28);
       midPoint.normalize().multiplyScalar(arcAltitude);
 
       const curve = new THREE.QuadraticBezierCurve3(startVec, midPoint, shipVec);
@@ -256,7 +275,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      camera.position.z = Math.max(180, Math.min(360, camera.position.z + e.deltaY * 0.14));
+      camera.position.z = Math.max(200, Math.min(480, camera.position.z + e.deltaY * 0.14));
     };
 
     const domElem = renderer.domElement;
@@ -297,7 +316,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
         const newOverlays: ProjectedPinOverlay[] = [];
 
         // Project Cruise Ship Marker
-        const shipWorldPos = latLngToVector3(shipPosition.lat, shipPosition.lng, GLOBE_RADIUS + 9);
+        const shipWorldPos = latLngToVector3(shipPosition.lat, shipPosition.lng, GLOBE_RADIUS + 8);
         shipWorldPos.applyEuler(globeGroupRef.current.rotation);
         const shipSurfaceNormal = shipWorldPos.clone().normalize();
         const shipVisible = shipSurfaceNormal.dot(cameraDir) > 0.18;
@@ -319,7 +338,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
 
         // Project Hometown Discovery Pins
         discoveries.forEach(d => {
-          const pinWorldPos = latLngToVector3(d.lat, d.lng, GLOBE_RADIUS + 8);
+          const pinWorldPos = latLngToVector3(d.lat, d.lng, GLOBE_RADIUS + 7);
           pinWorldPos.applyEuler(globeGroupRef.current!.rotation);
           const pinNormal = pinWorldPos.clone().normalize();
           const isVisible = pinNormal.dot(cameraDir) > 0.22;
@@ -351,6 +370,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
       const newW = container.clientWidth || 860;
       const newH = container.clientHeight || 600;
       camera.aspect = newW / newH;
+      camera.position.z = getIdealCameraZ(newW, newH);
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
     };
