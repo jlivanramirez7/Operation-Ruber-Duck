@@ -314,11 +314,8 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
 
           {errorMessage && <div className="form-error-alert">{errorMessage}</div>}
 
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
-              ✕
-            </button>
-            <button type="submit" className="btn-caribbean-primary" disabled={isSubmitting}>
+          <div className="modal-actions modal-actions-single">
+            <button type="submit" className="btn-caribbean-primary btn-full-width" disabled={isSubmitting}>
               {isSubmitting ? '🌍 Pinning...' : '🌴 Pin to 3D Globe!'}
             </button>
           </div>

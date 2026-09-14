@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Printer, QrCode, ShieldCheck, Sparkles, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import QRCode from 'qrcode';
+import { Printer, QrCode, ShieldCheck, X } from 'lucide-react';
 import { Duck } from '../types/duck';
 
 interface TagGeneratorModalProps {
@@ -13,11 +14,45 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
   onClose,
   ducks
 }) => {
-  const [selectedCount, setSelectedCount] = useState<number>(30);
-
-  if (!isOpen) return null;
+  const [qrDataUrls, setQrDataUrls] = useState<Record<string, string>>({});
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://cruiseduck-tracker.run.app';
+
+  useEffect(() => {
+    if (!isOpen || !ducks || ducks.length === 0) return;
+
+    let cancelled = false;
+    async function generateAllQrCodes() {
+      const map: Record<string, string> = {};
+      for (const duck of ducks) {
+        const qrTargetUrl = `${baseUrl}/?id=${duck.duckId}&sig=${duck.signatureHash}`;
+        try {
+          const dataUrl = await QRCode.toDataURL(qrTargetUrl, {
+            errorCorrectionLevel: 'H',
+            width: 240,
+            margin: 1,
+            color: {
+              dark: '#041826',
+              light: '#FFFFFF'
+            }
+          });
+          map[duck.duckId] = dataUrl;
+        } catch (err) {
+          // fallback if needed
+        }
+      }
+      if (!cancelled) {
+        setQrDataUrls(map);
+      }
+    }
+
+    generateAllQrCodes();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, ducks, baseUrl]);
+
+  if (!isOpen) return null;
 
   const handlePrintTags = () => {
     window.print();
@@ -30,9 +65,11 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
           <div>
             <div className="modal-header-badge">
               <QrCode size={16} />
-              <span>PHYSICAL WATERPROOF QR TAG STUDIO (30 DUCKS)</span>
+              <span>PHYSICAL WATERPROOF QR TAG STUDIO (ALL 30 DUCKS)</span>
             </div>
-            <h2 className="modal-title">Printable 1.5" × 1.5" Waterproof Duck Tags (DUCK-001 to DUCK-030)</h2>
+            <h2 className="modal-title">
+              Printable Waterproof Duck Tags (DUCK-001 to DUCK-030)
+            </h2>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close tag studio">
             <X size={20} />
@@ -43,34 +80,27 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
           <div className="tag-spec-summary">
             <ShieldCheck size={16} />
             <span>
-              <strong>Marine Waterproof Spec:</strong> 1.5"×1.5" PVC/Vinyl die-cut label • QR Error Correction Level H (30% recovery) • Includes cryptographic HMAC signature (<code>?id=DUCK-XXX&amp;sig=...</code>).
+              <strong>All 30 Ducks Ready to Print:</strong> DUCK-001 through DUCK-030 with cryptographic HMAC signatures • Zero page-cut protection enabled for Print Preview.
             </span>
           </div>
           <div className="tag-studio-actions">
-            <select
-              className="tropical-input tag-count-select"
-              value={selectedCount}
-              onChange={e => setSelectedCount(Number(e.target.value))}
-            >
-              <option value={6}>Show First 6 Tags</option>
-              <option value={12}>Show First 12 Tags</option>
-              <option value={20}>Show First 20 Tags</option>
-              <option value={30}>Show All 30 Tags</option>
-            </select>
             <button type="button" className="btn-caribbean-primary" onClick={handlePrintTags}>
               <Printer size={16} />
-              <span>Print All {Math.min(selectedCount, ducks.length)} Waterproof Tags</span>
+              <span>Print All {ducks.length} Waterproof Tags</span>
             </button>
           </div>
         </div>
 
-        {/* Printable Waterproof Tag Grid */}
+        {/* Printable Waterproof Tag Grid (All 30 Ducks with Page-Break Protection) */}
         <div className="printable-tag-sheet">
-          {ducks.slice(0, selectedCount).map(duck => {
+          {ducks.map(duck => {
             const qrTargetUrl = `${baseUrl}/?id=${duck.duckId}&sig=${duck.signatureHash}`;
-            const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&ecc=H&data=${encodeURIComponent(
-              qrTargetUrl
-            )}`;
+            const qrImgSrc =
+              qrDataUrls[duck.duckId] ||
+              `https://api.qrserver.com/v1/create-qr-code/?size=200x200&ecc=H&data=${encodeURIComponent(
+                qrTargetUrl
+              )}`;
+
             return (
               <div key={duck.duckId} className="waterproof-tag-card">
                 <div className="tag-hole-punch" title="3mm Zip-Tie / Stainless Loop Punch" />
@@ -81,10 +111,9 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
 
                 <div className="tag-qr-box">
                   <img
-                    src={qrImageUrl}
+                    src={qrImgSrc}
                     alt={`QR code for ${duck.duckId}`}
                     className="tag-qr-img"
-                    loading="lazy"
                   />
                 </div>
 

@@ -1262,6 +1262,10 @@ body {
 
 /* Print Stylesheet for Physical Waterproof Tags */
 @media print {
+  @page {
+    size: letter;
+    margin: 0.35in;
+  }
   body {
     background: #ffffff !important;
     color: #000000 !important;
@@ -1285,8 +1289,17 @@ body {
     padding: 0 !important;
   }
   .printable-tag-sheet {
+    display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0.5rem !important;
+    gap: 0.35in !important;
+    page-break-after: auto !important;
+  }
+  .waterproof-tag-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    border: 2px dashed #204B66 !important;
+    margin-bottom: 0.15in !important;
   }
 }
 
@@ -1429,5 +1442,49 @@ body {
   background: linear-gradient(90deg, transparent, rgba(0, 210, 184, 0.28), transparent);
   margin: 1.35rem 0;
 }
+
+.scan-qr-hint-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(0, 210, 184, 0.14);
+  border: 1px solid rgba(0, 210, 184, 0.45);
+  border-radius: 999px;
+  padding: 0.65rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #E8F6FF;
+}
+
+.modal-actions-single {
+  display: flex;
+  justify-content: stretch;
+  margin-top: 0.5rem;
+}
+
+.btn-full-width {
+  width: 100%;
+  justify-content: center;
+}
+
+.duck-finders-hometown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.duck-finder-hometown-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 210, 184, 0.1);
+  border: 1px solid rgba(0, 210, 184, 0.25);
+  border-radius: 8px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.78rem;
+  color: #E8F6FF;
+}
+
 
 

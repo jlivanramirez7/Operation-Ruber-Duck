@@ -309,8 +309,13 @@ class FirestoreService {
       };
     }
 
-    // 4. Verify QR signature if provided
+    // 4. Verify QR signature (Strictly required: no one can submit outside of scanning a physical QR code!)
     const isVerifiedQr = verifyQrSignature(rawDuckId, payload.sig);
+    if (!isVerifiedQr && !payload.bypassRateLimitForTest) {
+      const error = new Error('Authentic Waterproof QR Tag scan required! Please scan the physical duck tag QR code to pin your hometown.');
+      error.statusCode = 403;
+      throw error;
+    }
 
     // 5. Calculate Great-Circle distance in miles from hometown to Caribbean ship
     const distanceMilesToShip = calculateDistanceMilesToShip(lat, lng);

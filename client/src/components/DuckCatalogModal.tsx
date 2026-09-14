@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { Award, CheckCircle, Clock, Compass, MapPin, PlusCircle, Search, X } from 'lucide-react';
-import { Duck } from '../types/duck';
+import { Award, Clock, MapPin, Search, Users, X } from 'lucide-react';
+import { Discovery, Duck } from '../types/duck';
 import { formatPinnedTimestamp } from '../utils/timeFormat';
 
 interface DuckCatalogModalProps {
   isOpen: boolean;
   onClose: () => void;
   ducks: Duck[];
-  onSelectDuckToLog: (duckId: string, sig: string) => void;
+  discoveries: Discovery[];
 }
 
 export const DuckCatalogModal: React.FC<DuckCatalogModalProps> = ({
   isOpen,
   onClose,
   ducks,
-  onSelectDuckToLog
+  discoveries
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'found' | 'hidden'>('all');
@@ -41,9 +41,11 @@ export const DuckCatalogModal: React.FC<DuckCatalogModalProps> = ({
           <div>
             <div className="modal-header-badge">
               <Award size={16} />
-              <span>CAPTAIN IVAN & LUCAS'S FLEET ROSTER</span>
+              <span>OPERATION RUBBER DUCK • 30 SHIP DUCKS</span>
             </div>
-            <h2 className="modal-title">Operation Rubber Duck Fleet ({foundCount}/{ducks.length} Spotted)</h2>
+            <h2 className="modal-title">
+              30 Ship Ducks ({foundCount}/{ducks.length} Spotted)
+            </h2>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close roster">
             <X size={20} />
@@ -56,7 +58,7 @@ export const DuckCatalogModal: React.FC<DuckCatalogModalProps> = ({
             <input
               type="text"
               className="tropical-input"
-              placeholder="Search duck ID or theme (e.g., DUCK-007, Pirate, Pineapple)..."
+              placeholder="Search duck # or name (e.g. DUCK-007, Barnaby, Captain)..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -87,54 +89,80 @@ export const DuckCatalogModal: React.FC<DuckCatalogModalProps> = ({
         </div>
 
         <div className="duck-cards-grid">
-          {filteredDucks.map(duck => (
-            <div
-              key={duck.duckId}
-              className={`duck-roster-card ${duck.findCount > 0 ? 'duck-found' : 'duck-unfound'}`}
-            >
-              <div className="duck-roster-top">
-                <span className="duck-id-pill">{duck.duckId}</span>
-                <span className={`find-count-badge ${duck.findCount > 0 ? 'badge-gold' : 'badge-sea'}`}>
-                  {duck.findCount > 0 ? `🎉 Found ${duck.findCount}x` : '🏝️ Still Hidden'}
-                </span>
-              </div>
+          {filteredDucks.map(duck => {
+            const duckFinds = discoveries.filter(disc => disc.duckId === duck.duckId);
+            const totalFindsCount = Math.max(duck.findCount || 0, duckFinds.length);
 
-              <h3 className="duck-roster-name">{duck.name}</h3>
-              <p className="duck-roster-theme">{duck.theme}</p>
-
-              <div className="duck-roster-meta">
-                <div className="meta-line">
-                  <Compass size={13} />
-                  <span>Hint: {duck.originDeck}</span>
-                </div>
-                {duck.lastFoundByCity && (
-                  <div className="meta-line last-found">
-                    <MapPin size={13} />
-                    <span>Last spotted by: {duck.lastFoundByCity}</span>
-                  </div>
-                )}
-                {duck.lastFoundAt && (
-                  <div className="meta-line last-found-time">
-                    <Clock size={13} />
-                    <span>
-                      Last Pinned: {formatPinnedTimestamp(duck.lastFoundAt).shortDateTime}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                className="btn-log-this-duck"
-                onClick={() => {
-                  onSelectDuckToLog(duck.duckId, duck.signatureHash);
-                }}
+            return (
+              <div
+                key={duck.duckId}
+                className={`duck-roster-card ${totalFindsCount > 0 ? 'duck-found' : 'duck-unfound'}`}
               >
-                <PlusCircle size={15} />
-                <span>I Found {duck.duckId}! Log Hometown</span>
-              </button>
-            </div>
-          ))}
+                <div className="duck-roster-top">
+                  <span className="duck-id-pill">{duck.duckId}</span>
+                  <span
+                    className={`find-count-badge ${
+                      totalFindsCount > 0 ? 'badge-gold' : 'badge-sea'
+                    }`}
+                  >
+                    {totalFindsCount > 0 ? `🎉 Found ${totalFindsCount}x` : '🏝️ Still Hidden'}
+                  </span>
+                </div>
+
+                <h3 className="duck-roster-name">{duck.name}</h3>
+                <p className="duck-roster-theme">{duck.theme}</p>
+
+                <div className="duck-roster-meta">
+                  <div className="meta-line">
+                    <Users size={13} />
+                    <strong>
+                      {totalFindsCount > 0
+                        ? `Spotted by ${totalFindsCount} fellow ${
+                            totalFindsCount === 1 ? 'cruiser' : 'cruisers'
+                          }:`
+                        : 'Waiting to be discovered on deck'}
+                    </strong>
+                  </div>
+
+                  {/* List of Hometowns where Finders were from */}
+                  {duckFinds.length > 0 ? (
+                    <div className="duck-finders-hometown-list">
+                      {duckFinds.map(find => (
+                        <div key={find.id} className="duck-finder-hometown-pill">
+                          <MapPin size={12} className="pin-icon" />
+                          <span>
+                            <strong>
+                              {find.city}
+                              {find.region ? `, ${find.region}` : ''}
+                            </strong>{' '}
+                            ({find.country})
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : duck.lastFoundByCity ? (
+                    <div className="duck-finders-hometown-list">
+                      <div className="duck-finder-hometown-pill">
+                        <MapPin size={12} className="pin-icon" />
+                        <span>
+                          <strong>{duck.lastFoundByCity}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {duck.lastFoundAt && (
+                    <div className="meta-line last-found-time">
+                      <Clock size={13} />
+                      <span>
+                        Last Pinned: {formatPinnedTimestamp(duck.lastFoundAt).shortDateTime}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

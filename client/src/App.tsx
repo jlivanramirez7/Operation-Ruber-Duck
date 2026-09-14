@@ -153,14 +153,16 @@ export const App: React.FC = () => {
             <span>QR Tags</span>
           </button>
 
-          <button
-            type="button"
-            className="nav-btn-found-cta"
-            onClick={() => setIsFindModalOpen(true)}
-          >
-            <PlusCircle size={17} />
-            <span>📍 Pin Hometown</span>
-          </button>
+          {Boolean(scannedSignature) && (
+            <button
+              type="button"
+              className="nav-btn-found-cta"
+              onClick={() => setIsFindModalOpen(true)}
+            >
+              <PlusCircle size={17} />
+              <span>📍 Pin {scannedDuckId}</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -187,14 +189,21 @@ export const App: React.FC = () => {
             </div>
 
             <div className="hero-cta-row">
-              <button
-                type="button"
-                className="btn-caribbean-primary btn-large"
-                onClick={() => setIsFindModalOpen(true)}
-              >
-                <MapPin size={18} />
-                <span>Found a Duck? Pin Hometown!</span>
-              </button>
+              {Boolean(scannedSignature) ? (
+                <button
+                  type="button"
+                  className="btn-caribbean-primary btn-large"
+                  onClick={() => setIsFindModalOpen(true)}
+                >
+                  <MapPin size={18} />
+                  <span>Pin Scanned {scannedDuckId}!</span>
+                </button>
+              ) : (
+                <div className="scan-qr-hint-pill">
+                  <QrCode size={18} />
+                  <span>📷 Scan Duck QR Tag on Ship to Pin!</span>
+                </div>
+              )}
               <button
                 type="button"
                 className="btn-glass-outline"
@@ -356,12 +365,7 @@ export const App: React.FC = () => {
         isOpen={isCatalogModalOpen}
         onClose={() => setIsCatalogModalOpen(false)}
         ducks={ducks}
-        onSelectDuckToLog={(duckId, sig) => {
-          setIsCatalogModalOpen(false);
-          setScannedDuckId(duckId);
-          setScannedSignature(sig);
-          setIsFindModalOpen(true);
-        }}
+        discoveries={discoveries}
       />
 
       <TagGeneratorModal
