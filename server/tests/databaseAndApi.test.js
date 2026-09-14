@@ -223,11 +223,11 @@ async function runTests() {
     passed++;
 
     // ------------------------------------------------------------------------
-    // TEST 6: Gemini AI Background Note Moderator (5-Word Limit + Family-Safe Rewrite)
+    // TEST 6: Gemini AI Background Note Moderator (10-Word Limit + Family-Safe Rewrite)
     // ------------------------------------------------------------------------
-    console.log('\nTEST 6: Verifying Gemini AI Background Note Moderator (5-word limit + inappropriate text rewrite)...');
+    console.log('\nTEST 6: Verifying Gemini AI Background Note Moderator (10-word limit + inappropriate text rewrite)...');
     const deviceDFingerprint = `device_D_family_${Date.now()}`;
-    const longDirtyNote = 'Holy shit this damn duck sucks and is way too long for five words!';
+    const longDirtyNote = 'Holy shit this damn duck sucks and is way too long because it has sixteen words total!';
     const modRes = await requestJson(server, 'POST', '/api/discoveries', {
       duckId: 'DUCK-022',
       sig: generateDuckSignature('DUCK-022'),
@@ -246,12 +246,12 @@ async function runTests() {
     const savedNote = modRes.body.discovery.note;
     const savedWordCount = savedNote.trim().split(/\s+/).filter(Boolean).length;
     assert.ok(
-      savedWordCount <= 5,
-      `Saved note must be strictly <= 5 words (got ${savedWordCount} words: "${savedNote}")`
+      savedWordCount <= 10,
+      `Saved note must be strictly <= 10 words (got ${savedWordCount} words: "${savedNote}")`
     );
     assert.ok(!/shit|damn|sucks/i.test(savedNote), `Inappropriate words must be completely scrubbed ("${savedNote}")`);
     assert.strictEqual(modRes.body.discovery.noteModerated, true, 'noteModerated flag should be true');
-    console.log(`   ✅ Verified inappropriate 14-word input automatically rewritten by Gemini AI Moderator to clean ${savedWordCount}-word phrase: "${savedNote}"`);
+    console.log(`   ✅ Verified inappropriate 16-word input automatically rewritten by Gemini AI Moderator to clean ${savedWordCount}-word phrase: "${savedNote}"`);
     passed++;
 
   } catch (err) {

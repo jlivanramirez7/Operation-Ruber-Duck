@@ -7,21 +7,21 @@
  * (same architecture as D&D Helper Agent `GeminiService`).
  *
  * Runs in the background whenever a finder submits an optional note:
- * 1. Strictly enforces a 5-word maximum.
+ * 1. Strictly enforces a 10-word maximum.
  * 2. Uses Google Cloud Vertex AI (`gemini-2.5-flash` via ADC) + family-safe guardrails
  *    to scrub and rewrite any inappropriate, profane, negative, or PII content into a
- *    cheerful 3-5 word Caribbean cruise celebration.
+ *    cheerful 5-10 word Caribbean cruise celebration.
  */
 
 const { GoogleGenAI } = require('@google/genai');
 
 const CHEERFUL_CRUISE_REWRITES = [
-  'Loving this sunny cruise! 🌴',
-  'Best vacation day ever! 🦆',
-  'Happy sailing from deck! 🚢',
-  'Found by the pool! ☀️',
-  'Cruising the Caribbean seas! 🌊',
-  'Ahoy fellow duck hunters! ⚓'
+  'Loving this sunny Caribbean cruise adventure! 🌴',
+  'Best vacation day ever on deck! 🦆',
+  'Happy sailing from our sunny cruise ship! 🚢',
+  'Found hiding right by the pool deck! ☀️',
+  'Cruising the crystal clear Caribbean seas! 🌊',
+  'Ahoy fellow duck hunters aboard the ship! ⚓'
 ];
 
 // Comprehensive family-safety blocklist (profanity, adult themes, insults, PII indicators)
@@ -32,13 +32,13 @@ const INAPPROPRIATE_PATTERNS = [
 ];
 
 /**
- * Truncates any string to a maximum of 5 words.
+ * Truncates any string to a maximum of 10 words.
  */
-function enforceMaxFiveWords(text) {
+function enforceMaxTenWords(text) {
   if (!text || typeof text !== 'string') return '';
   const words = text.trim().split(/\s+/).filter(Boolean);
-  if (words.length <= 5) return words.join(' ');
-  return words.slice(0, 5).join(' ');
+  if (words.length <= 10) return words.join(' ');
+  return words.slice(0, 10).join(' ');
 }
 
 /**
@@ -50,7 +50,7 @@ function containsInappropriateContent(text) {
 }
 
 /**
- * Picks a deterministic cheerful 4-word cruise phrase based on input hash.
+ * Picks a deterministic cheerful 6-word cruise phrase based on input hash.
  */
 function getCheerfulRewrite(seedText = '') {
   let hash = 0;
@@ -67,6 +67,7 @@ class GeminiNoteModeratorService {
     this.projectId = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCP_PROJECT_ID || 'operationruberduck';
     this.location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
     this.activeModelUsed = this.modelName;
+    this.activeProjectId = null;
   }
 
   /**
@@ -130,7 +131,6 @@ class GeminiNoteModeratorService {
           return result;
         } catch (adcErr) {
           lastError = adcErr;
-          // If project permission denied or not found, move immediately to next project
           if (
             adcErr.message &&
             (adcErr.message.includes('403') ||
@@ -171,7 +171,7 @@ class GeminiNoteModeratorService {
 
   /**
    * Moderates and rewrites a user note using Vertex AI Agent Platform (`gemini-2.5-flash`)
-   * with strict 5-word enforcement and instant family-safe guardrails.
+   * with strict 10-word enforcement and instant family-safe guardrails.
    */
   async moderateAndRewriteNote(rawNote) {
     if (!rawNote || typeof rawNote !== 'string' || !rawNote.trim()) {
@@ -190,11 +190,11 @@ class GeminiNoteModeratorService {
     const systemInstruction = `You are a family-friendly Caribbean cruise scavenger hunt moderator for kids and parents.
 Read the user's short note.
 Rules:
-1. Maximum 5 words strictly.
-2. If the note is clean, positive, family-friendly, and 5 words or fewer, return it unchanged.
-3. If the note is longer than 5 words, condense it to 5 cheerful words or fewer.
-4. If the note contains ANY profanity, insults, adult themes, alcohol/drug references, negative vibes, or personal info (phone/email), rewrite it completely into a cheerful 4-5 word Caribbean cruise celebration (for example: "Loving this sunny cruise! 🌴" or "Best vacation day ever! 🦆").
-5. Output ONLY the final 1-5 word note, nothing else.`;
+1. Maximum 10 words strictly.
+2. If the note is clean, positive, family-friendly, and 10 words or fewer, return it unchanged.
+3. If the note is longer than 10 words, condense it to 10 cheerful words or fewer while preserving the fun vibe.
+4. If the note contains ANY profanity, insults, adult themes, alcohol/drug references, negative vibes, or personal info (phone/email), rewrite it completely into a cheerful 5-10 word Caribbean cruise celebration (for example: "Loving this sunny Caribbean cruise adventure! 🌴" or "Best vacation day ever on deck! 🦆").
+5. Output ONLY the final 1-10 word note, nothing else.`;
 
     try {
       const vertexRes = await this.callVertexGemini(`User note: "${trimmed}"`, systemInstruction);
@@ -203,15 +203,15 @@ Rules:
       if (candidateText) {
         const finalAiNote = containsInappropriateContent(candidateText)
           ? getCheerfulRewrite(trimmed)
-          : enforceMaxFiveWords(candidateText);
+          : enforceMaxTenWords(candidateText);
 
         return {
           finalNote: finalAiNote,
           wasRewritten: finalAiNote !== trimmed,
           reason: isLocallyFlagged
             ? 'inappropriate_scrubbed'
-            : wordCount > 5
-            ? 'condensed_to_5_words'
+            : wordCount > 10
+            ? 'condensed_to_10_words'
             : finalAiNote !== trimmed
             ? 'gemini_polished'
             : 'clean',
@@ -219,7 +219,6 @@ Rules:
         };
       }
     } catch (err) {
-      // Fallback to deterministic family-safe guardrail if offline
       console.warn(`[GeminiNoteModerator] Vertex AI ADC fallback triggered (${err.message}). Applying deterministic family-safety shield.`);
     }
 
@@ -233,11 +232,11 @@ Rules:
       };
     }
 
-    const capped = enforceMaxFiveWords(trimmed);
+    const capped = enforceMaxTenWords(trimmed);
     return {
       finalNote: capped,
       wasRewritten: capped !== trimmed,
-      reason: capped !== trimmed ? 'condensed_to_5_words' : 'clean',
+      reason: capped !== trimmed ? 'condensed_to_10_words' : 'clean',
       moderatedBy: 'vertex-ai-safety-shield'
     };
   }
@@ -253,6 +252,7 @@ module.exports = {
   GeminiNoteModeratorService,
   geminiNoteModeratorService,
   moderateAndRewriteNote,
-  enforceMaxFiveWords,
+  enforceMaxTenWords,
+  enforceMaxFiveWords: enforceMaxTenWords, // backwards compatibility alias
   containsInappropriateContent
 };

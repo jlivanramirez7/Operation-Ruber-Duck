@@ -18,10 +18,10 @@ interface FindSubmissionModalProps {
 }
 
 const QUICK_VIBE_NOTES = [
-  { emoji: '🍦', text: 'By the ice cream!' },
-  { emoji: '🍹', text: 'Pool bar vibes!' },
-  { emoji: '🤫', text: 'Secretly re-hidden!' },
-  { emoji: '☀️', text: 'Best cruise day!' }
+  { emoji: '🍦', text: 'Found hiding by the soft serve ice cream machine!' },
+  { emoji: '🍹', text: 'Chilling out by the sunny Lido pool bar!' },
+  { emoji: '🤫', text: 'Secretly re-hidden on deck for the next hunter!' },
+  { emoji: '☀️', text: 'Having the best family Caribbean cruise vacation ever!' }
 ];
 
 function countWords(text: string): number {
@@ -29,10 +29,10 @@ function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
-function capToFiveWords(text: string): string {
+function capToTenWords(text: string): string {
   const words = text.trim().split(/\s+/).filter(Boolean);
-  if (words.length <= 5) return text;
-  return words.slice(0, 5).join(' ');
+  if (words.length <= 10) return text;
+  return words.slice(0, 10).join(' ');
 }
 
 export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
@@ -150,8 +150,8 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
 
   const handleNoteChange = (val: string) => {
     const words = val.trim().split(/\s+/).filter(Boolean);
-    if (words.length > 5 && val.endsWith(' ')) {
-      setNote(capToFiveWords(val));
+    if (words.length > 10 && val.endsWith(' ')) {
+      setNote(capToTenWords(val));
     } else {
       setNote(val);
     }
@@ -187,7 +187,7 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
           countryCode: selectedCity.countryCode,
           lat: selectedCity.lat,
           lng: selectedCity.lng,
-          note: capToFiveWords(note.trim()),
+          note: capToTenWords(note.trim()),
           deckFound: activeDuck.originDeck || 'Cruise Ship Deck',
           fingerprintHash
         })
@@ -322,12 +322,12 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
             )}
           </div>
 
-          {/* Step 3: Optional 5-Word Note + Background Gemini AI Moderator */}
+          {/* Step 3: Optional 10-Word Note + Background Gemini AI Moderator */}
           <div className="form-group">
             <div className="form-label-row">
-              <label className="form-label">③ 💬 5-Word Vibe (Optional)</label>
-              <span className={`char-counter ${wordCount >= 5 ? 'word-limit-reached' : ''}`}>
-                {wordCount}/5 words
+              <label className="form-label">③ 💬 10-Word Vibe (Optional)</label>
+              <span className={`char-counter ${wordCount >= 10 ? 'word-limit-reached' : ''}`}>
+                {wordCount}/10 words
               </span>
             </div>
 
@@ -348,9 +348,9 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
 
             <input
               type="text"
-              maxLength={45}
+              maxLength={90}
               className="tropical-input"
-              placeholder="✍️ Max 5 words (e.g. Loving this sunny cruise! 🌴)"
+              placeholder="✍️ Max 10 words (e.g. Found hiding by the soft serve ice cream machine! 🍦)"
               value={note}
               onChange={e => handleNoteChange(e.target.value)}
             />
