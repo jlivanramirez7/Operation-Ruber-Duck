@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, Compass, Globe2, MapPin, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { CheckCircle2, Globe2, MapPin, ShieldCheck, Sparkles, X } from 'lucide-react';
 import { BUNDLED_WORLD_CITIES } from '../data/worldCities';
 import { Duck, WorldCity } from '../types/duck';
 import {
@@ -17,18 +17,23 @@ interface FindSubmissionModalProps {
   onSubmissionSuccess: (newDiscovery: any) => void;
 }
 
-const DECK_OPTIONS = [
-  'Deck 11 - Lido Pool & Tiki Bar',
-  'Deck 10 - Serenity Sun Deck',
-  'Deck 8 - Central Park Promenade',
-  'Deck 6 - Schooner Piano Bar',
-  'Deck 5 - Guest Services Atrium',
-  'Deck 12 - Mini Golf & Sports Deck',
-  'Deck 14 - Observation Lounge',
-  'Deck 15 - Solarium Hot Tubs',
-  'Deck 4 - Casino Royale',
-  'Other Cruise Ship Deck'
+const QUICK_VIBE_NOTES = [
+  { emoji: '🍦', text: 'By the ice cream!' },
+  { emoji: '🍹', text: 'Pool bar vibes!' },
+  { emoji: '🤫', text: 'Secretly re-hidden!' },
+  { emoji: '☀️', text: 'Best cruise day!' }
 ];
+
+function countWords(text: string): number {
+  if (!text || !text.trim()) return 0;
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function capToFiveWords(text: string): string {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= 5) return text;
+  return words.slice(0, 5).join(' ');
+}
 
 export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
   isOpen,
@@ -44,8 +49,9 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
   const [customCityName, setCustomCityName] = useState('');
   const [customCountryName, setCustomCountryName] = useState('United States');
   const [isSearchingGeocoder, setIsSearchingGeocoder] = useState(false);
-  const [deckFound, setDeckFound] = useState(DECK_OPTIONS[0]);
   const [note, setNote] = useState('');
+  const [moderatedPreview, setModeratedPreview] = useState<string | null>(null);
+  const [isModerating, setIsModerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -54,6 +60,37 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
       setSelectedDuckId(initialDuckId.toUpperCase().trim());
     }
   }, [initialDuckId]);
+
+  // Background Gemini AI Note Moderator debounce check
+  useEffect(() => {
+    if (!note.trim()) {
+      setModeratedPreview(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsModerating(true);
+      try {
+        const res = await fetch('/api/moderate-note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.wasRewritten && data.finalNote) {
+            setModeratedPreview(data.finalNote);
+          } else {
+            setModeratedPreview(null);
+          }
+        }
+      } catch {
+        // silent background check
+      } finally {
+        setIsModerating(false);
+      }
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [note]);
 
   if (!isOpen) return null;
 
@@ -71,8 +108,8 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
           c.city.toLowerCase().includes(cityQuery.toLowerCase()) ||
           c.country.toLowerCase().includes(cityQuery.toLowerCase()) ||
           c.region.toLowerCase().includes(cityQuery.toLowerCase())
-      ).slice(0, 7)
-    : BUNDLED_WORLD_CITIES.slice(0, 5);
+      ).slice(0, 6)
+    : BUNDLED_WORLD_CITIES.slice(0, 6);
 
   const handleSelectBundledCity = (c: WorldCity) => {
     setSelectedCity(c);
@@ -102,12 +139,21 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
         setSelectedCity(resolved);
         setCityQuery(`${resolved.city}, ${resolved.country}`);
       } else {
-        setErrorMessage('Could not locate coordinates for that town. Try picking your nearest major city!');
+        setErrorMessage('Could not locate town. Pick nearest city!');
       }
     } catch {
-      setErrorMessage('Satellite Wi-Fi lookup timed out. Please pick your nearest major city from the list!');
+      setErrorMessage('Satellite lookup timed out. Pick nearest city!');
     } finally {
       setIsSearchingGeocoder(false);
+    }
+  };
+
+  const handleNoteChange = (val: string) => {
+    const words = val.trim().split(/\s+/).filter(Boolean);
+    if (words.length > 5 && val.endsWith(' ')) {
+      setNote(capToFiveWords(val));
+    } else {
+      setNote(val);
     }
   };
 
@@ -117,14 +163,12 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
 
     const cooldown = checkLocalDuckCooldown(selectedDuckId);
     if (!cooldown.allowed) {
-      setErrorMessage(
-        `Ahoy! Your device already pinned ${selectedDuckId} recently. Wait ${cooldown.minutesLeft} min or log another duck!`
-      );
+      setErrorMessage(`Already pinned ${selectedDuckId}! Wait ${cooldown.minutesLeft}m.`);
       return;
     }
 
     if (!selectedCity) {
-      setErrorMessage('Please choose your hometown city from the quick list (or look up your town) first!');
+      setErrorMessage('Tap your hometown city first! 📍');
       return;
     }
 
@@ -143,15 +187,15 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
           countryCode: selectedCity.countryCode,
           lat: selectedCity.lat,
           lng: selectedCity.lng,
-          note: note.trim(),
-          deckFound,
+          note: capToFiveWords(note.trim()),
+          deckFound: activeDuck.originDeck || 'Cruise Ship Deck',
           fingerprintHash
         })
       });
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Could not save duck discovery to database.');
+        throw new Error(data.error || 'Could not save duck discovery.');
       }
 
       recordLocalDuckSubmission(selectedDuckId);
@@ -164,13 +208,16 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
     }
   };
 
+  const wordCount = countWords(note);
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="caribbean-modal" onClick={e => e.stopPropagation()}>
+        {/* Wordless Pictographic Header Strip */}
         <div className="modal-header-tropical">
           <div className="modal-header-badge">
             <Sparkles size={16} />
-            <span>AHOY! YOU FOUND A CRUISE DUCK!</span>
+            <span>① 🦆 DUCK ➔ ② 📍 CITY ➔ ③ 🌍 PIN!</span>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close modal">
             <X size={20} />
@@ -178,42 +225,43 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          {/* Selected Duck Banner */}
+          {/* Step 1: Duck Badge (Compact Pictographic Pill) */}
           <div className="duck-id-banner">
             <div className="duck-id-icon">🦆</div>
             <div className="duck-id-details">
               <label htmlFor="duckIdSelect" className="duck-select-label">
-                Which Cruise Duck did you find?
+                ① Duck Found
               </label>
               <select
                 id="duckIdSelect"
                 className="duck-select-input"
                 value={selectedDuckId}
                 onChange={e => setSelectedDuckId(e.target.value)}
+                aria-label="Select Cruise Duck ID"
               >
                 {ducks.map(d => (
                   <option key={d.duckId} value={d.duckId}>
-                    {d.duckId} — {d.name} ({d.theme})
+                    {d.duckId} • {d.name}
                   </option>
                 ))}
               </select>
             </div>
             {initialSignature && (
               <span className="verified-tag-pill" title="Authentic Waterproof QR Tag Scanned">
-                <ShieldCheck size={14} /> QR Verified
+                <ShieldCheck size={14} /> ✓ QR
               </span>
             )}
           </div>
 
-          {/* Step 1: Hometown City Picker */}
+          {/* Step 2: Hometown City Picker */}
           <div className="form-group">
             <label className="form-label">
-              <Globe2 size={16} /> Where are you cruising from? (Hometown City)
+              <Globe2 size={16} /> ② 📍 Your Hometown City
             </label>
             <input
               type="text"
               className="tropical-input"
-              placeholder="Search city (e.g., Seattle, Toronto, London, Miami...)"
+              placeholder="🔍 Type city (e.g. Miami, Toronto, London...)"
               value={cityQuery}
               onChange={e => {
                 setCityQuery(e.target.value);
@@ -235,8 +283,7 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
                   >
                     <MapPin size={13} />
                     <span>
-                      {c.city}
-                      {c.region ? `, ${c.region}` : ''} ({c.countryCode})
+                      {c.city} ({c.countryCode})
                     </span>
                     {isSelected && <CheckCircle2 size={14} className="chip-check" />}
                   </button>
@@ -244,15 +291,14 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
               })}
             </div>
 
-            {/* Custom Town Lookup */}
+            {/* Custom Town Lookup (only if not in bundled list) */}
             {!selectedCity && cityQuery.length > 2 && filteredCities.length === 0 && (
               <div className="custom-town-box">
-                <p className="custom-town-hint">Town not in quick list? Enter City & Country:</p>
                 <div className="custom-town-row">
                   <input
                     type="text"
                     className="tropical-input"
-                    placeholder="Town / City Name"
+                    placeholder="City Name"
                     value={customCityName}
                     onChange={e => setCustomCityName(e.target.value)}
                   />
@@ -269,64 +315,76 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
                     onClick={handleLookupCustomTown}
                     disabled={isSearchingGeocoder}
                   >
-                    {isSearchingGeocoder ? 'Locating...' : 'Pin Town'}
+                    {isSearchingGeocoder ? '...' : '📍 Pin'}
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Step 2: Deck Found */}
-          <div className="form-group">
-            <label className="form-label">
-              <Compass size={16} /> Where on the ship did you spot {activeDuck.name}?
-            </label>
-            <select
-              className="tropical-input"
-              value={deckFound}
-              onChange={e => setDeckFound(e.target.value)}
-            >
-              {DECK_OPTIONS.map(deck => (
-                <option key={deck} value={deck}>
-                  {deck}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Step 3: Optional Congratulatory Note */}
+          {/* Step 3: Optional 5-Word Note + Background Gemini AI Moderator */}
           <div className="form-group">
             <div className="form-label-row">
-              <label className="form-label">Fun Cruise Note or Shout-out (Optional)</label>
-              <span className="char-counter">{note.length}/100</span>
+              <label className="form-label">③ 💬 5-Word Vibe (Optional)</label>
+              <span className={`char-counter ${wordCount >= 5 ? 'word-limit-reached' : ''}`}>
+                {wordCount}/5 words
+              </span>
             </div>
+
+            {/* 1-Tap Emoji Mood Chips */}
+            <div className="quick-vibe-chips">
+              {QUICK_VIBE_NOTES.map(v => (
+                <button
+                  key={v.text}
+                  type="button"
+                  className="vibe-chip-btn"
+                  onClick={() => setNote(v.text)}
+                >
+                  <span>{v.emoji}</span>
+                  <span>{v.text}</span>
+                </button>
+              ))}
+            </div>
+
             <input
               type="text"
-              maxLength={100}
+              maxLength={45}
               className="tropical-input"
-              placeholder="e.g., Found hiding by the soft-serve ice cream station! Re-hiding on Deck 8! 🌴🍦"
+              placeholder="✍️ Max 5 words (e.g. Loving this sunny cruise! 🌴)"
               value={note}
-              onChange={e => setNote(e.target.value)}
+              onChange={e => handleNoteChange(e.target.value)}
             />
+
+            {/* Live Gemini AI Family-Safe Shield Feedback */}
+            <div className="gemini-shield-row">
+              <span className="gemini-shield-badge">
+                <Sparkles size={13} />
+                {isModerating
+                  ? 'Gemini AI checking...'
+                  : moderatedPreview
+                  ? `✨ Gemini AI polished: "${moderatedPreview}"`
+                  : '✨ Gemini AI Family-Safe Shield Active'}
+              </span>
+            </div>
           </div>
 
-          {/* Zero-PII & Anti-Spam Notice */}
-          <div className="privacy-banner">
-            <ShieldCheck size={16} className="privacy-icon" />
-            <span>
-              <strong>100% Zero-PII Scavenger Hunt:</strong> No email, login, or personal info collected.
-              Your hometown pin is saved to Cloud Firestore (<code>operationruberduck-db</code>) for all fellow cruisers to see!
-            </span>
+          {/* Micro-Trust Badge (Zero Reading Fatigue) */}
+          <div className="micro-trust-pill">
+            <span>🛡️ No Login</span>
+            <span>•</span>
+            <span>🔒 Zero PII</span>
+            <span>•</span>
+            <span>✨ Gemini Safe</span>
           </div>
 
           {errorMessage && <div className="form-error-alert">{errorMessage}</div>}
 
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>
-              Cancel
+              ✕
             </button>
             <button type="submit" className="btn-caribbean-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Pinning to 3D Globe...' : '🌴 Pin My Hometown on the 3D Globe!'}
+              {isSubmitting ? '🌍 Pinning...' : '🌴 Pin to 3D Globe!'}
             </button>
           </div>
         </form>

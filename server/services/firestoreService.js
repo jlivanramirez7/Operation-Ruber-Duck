@@ -19,6 +19,7 @@ const {
   sanitizeDiscoveryInput,
   evaluateDeviceRateLimit
 } = require('./antiSpamService');
+const { moderateAndRewriteNote } = require('./geminiNoteModerator');
 
 const DATA_DIR = path.join(__dirname, '../data');
 const DUCKS_FILE = path.join(DATA_DIR, 'persistent_ducks.json');
@@ -326,6 +327,10 @@ class FirestoreService {
     });
     const discoveryId = `disc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
+    // Run Gemini AI Background Moderator & 5-Word Scrubber on user note
+    const moderationResult = await moderateAndRewriteNote(payload.note);
+    const finalSafeNote = moderationResult.finalNote || `Ahoy from ${sanitized.city}! 🦆`;
+
     const newDiscovery = {
       id: discoveryId,
       duckId: rawDuckId,
@@ -337,7 +342,9 @@ class FirestoreService {
       lat,
       lng,
       distanceMilesToShip,
-      note: sanitized.note || `Ahoy from ${sanitized.city}! Found ${duck.name}! 🦆🌴`,
+      note: finalSafeNote,
+      noteModerated: moderationResult.wasRewritten,
+      noteModerationReason: moderationResult.reason,
       deckFound: sanitized.deckFound || duck.originDeck || 'Cruise Ship Deck',
       fingerprintHash,
       verifiedQrSignature: isVerifiedQr,

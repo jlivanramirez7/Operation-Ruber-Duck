@@ -5,16 +5,13 @@ import {
   Award,
   Clock,
   Compass,
-  Database,
   Globe2,
   MapPin,
   Navigation,
   PlusCircle,
   QrCode,
   RefreshCw,
-  ShieldCheck,
   Ship,
-  Sparkles,
   Trophy
 } from 'lucide-react';
 import { GlobeView } from './components/GlobeView';
@@ -123,40 +120,37 @@ export const App: React.FC = () => {
 
   return (
     <div className="caribbean-app-shell">
-      {/* Top Tropical Navigation Bar */}
+      {/* Top Tropical Navigation Bar (Zero Reading Fatigue) */}
       <header className="caribbean-navbar">
         <div className="navbar-brand">
           <div className="brand-logo-circle">🦆</div>
           <div>
             <div className="brand-eyebrow">
-              <span>OPERATION RUBBER DUCK • CARIBBEAN CRUISE 2026</span>
+              <span>CARIBBEAN CRUISE 2026</span>
             </div>
-            <h1 className="brand-title">CruiseDuck Tracker</h1>
+            <h1 className="brand-title">CruiseDuck</h1>
           </div>
         </div>
 
         <div className="navbar-actions">
-          <div className="db-status-pill" title="Connected to Google Cloud Firestore (operationruberduck-db)">
-            <Database size={13} />
-            <span>DB: {stats?.databaseId || 'operationruberduck-db'}</span>
-          </div>
-
           <button
             type="button"
             className="nav-btn-secondary"
             onClick={() => setIsCatalogModalOpen(true)}
+            aria-label="View Duck Roster"
           >
             <Award size={16} />
-            <span>Duck Roster ({ducks.length})</span>
+            <span>30 Ducks</span>
           </button>
 
           <button
             type="button"
             className="nav-btn-secondary"
             onClick={() => setIsTagStudioOpen(true)}
+            aria-label="Open QR Tag Studio"
           >
             <QrCode size={16} />
-            <span>QR Tag Studio</span>
+            <span>QR Tags</span>
           </button>
 
           <button
@@ -165,26 +159,33 @@ export const App: React.FC = () => {
             onClick={() => setIsFindModalOpen(true)}
           >
             <PlusCircle size={17} />
-            <span>I Found a Duck! Pin Hometown</span>
+            <span>📍 Pin Hometown</span>
           </button>
         </div>
       </header>
 
       {/* Main Mobile-First Split Hero & 3D Globe Experience */}
       <main className="caribbean-main">
-        {/* Hero Welcome Banner for QR Scanners */}
-        <section className="caribbean-hero-banner">
+        {/* Wordless Pictographic Hero Strip + Nano Banana Graphic */}
+        <section className="caribbean-hero-banner wordless-hero-banner">
           <div className="hero-banner-content">
-            <div className="hero-pill">
-              <Sparkles size={14} />
-              <span>AHOY FELLOW DUCK HUNTERS! WELCOME ABOARD!</span>
+            <div className="wordless-step-strip">
+              <div className="wordless-step-pill">
+                <span className="step-num">①</span>
+                <span>📷 Scan</span>
+              </div>
+              <span className="step-arrow">➔</span>
+              <div className="wordless-step-pill">
+                <span className="step-num">②</span>
+                <span>📍 City</span>
+              </div>
+              <span className="step-arrow">➔</span>
+              <div className="wordless-step-pill">
+                <span className="step-num">③</span>
+                <span>🌍 3D Globe</span>
+              </div>
             </div>
-            <h2 className="hero-headline">
-              Found a hidden rubber duck on the ship? Pin your hometown on our 3D World Globe!
-            </h2>
-            <p className="hero-subtext">
-              My son Lucas and I hid custom waterproof QR ducks across the cruise ship decks. Scan any duck tag or tap below to pin your hometown city and see how far around the world our fellow cruisers traveled!
-            </p>
+
             <div className="hero-cta-row">
               <button
                 type="button"
@@ -192,7 +193,7 @@ export const App: React.FC = () => {
                 onClick={() => setIsFindModalOpen(true)}
               >
                 <MapPin size={18} />
-                <span>Pin My Hometown Now (No Login Required)</span>
+                <span>Found a Duck? Pin Hometown!</span>
               </button>
               <button
                 type="button"
@@ -200,26 +201,35 @@ export const App: React.FC = () => {
                 onClick={() => setIsCatalogModalOpen(true)}
               >
                 <Compass size={17} />
-                <span>View All {ducks.length} Ship Ducks</span>
+                <span>30 Ducks</span>
               </button>
             </div>
           </div>
 
-          {/* Farthest Traveler Highlight Card */}
+          {/* Nano Banana Wordless Graphic Guide */}
+          <div className="nano-banana-graphic-card">
+            <img
+              src="/wordless_duck_guide.jpg"
+              alt="Scan Duck QR -> Pin Hometown -> Spin 3D Globe"
+              className="nano-banana-img"
+            />
+          </div>
+
+          {/* Compact Farthest Traveler Trophy Pill */}
           {stats?.farthestDiscovery && (
             <div className="farthest-traveler-card">
               <div className="trophy-badge">
-                <Trophy size={18} />
-                <span>FARTHEST HOMETOWN TRAVELER</span>
+                <Trophy size={16} />
+                <span>🏆 FARTHEST PIN</span>
               </div>
               <div className="farthest-city">
                 {stats.farthestDiscovery.city}, {stats.farthestDiscovery.country}
               </div>
               <div className="farthest-miles">
-                {stats.farthestDiscovery.distanceMiles.toLocaleString()} miles to our Cruise Ship!
+                📏 {stats.farthestDiscovery.distanceMiles.toLocaleString()} mi
               </div>
               <div className="farthest-duck">
-                Spotted <strong>{stats.farthestDiscovery.duckId}</strong> ({stats.farthestDiscovery.duckName})
+                🦆 <strong>{stats.farthestDiscovery.duckId}</strong>
               </div>
             </div>
           )}
@@ -232,11 +242,11 @@ export const App: React.FC = () => {
             <div className="panel-card-header">
               <div className="panel-title-group">
                 <Globe2 size={18} className="turquoise-icon" />
-                <h3>Interactive 3D Duck Hunter World Globe</h3>
+                <h3>🌍 3D Duck Hunter Globe</h3>
               </div>
               <div className="ship-coord-tag">
                 <Ship size={14} />
-                <span>Ship Position: 21.47°N, 71.14°W (Caribbean Sea)</span>
+                <span>🚢 21.47°N, 71.14°W</span>
               </div>
             </div>
 
@@ -247,25 +257,25 @@ export const App: React.FC = () => {
               onSelectDiscovery={d => setSelectedDiscovery(d)}
             />
 
-            {/* Quick Telemetry KPI Strip */}
+            {/* Quick Pictographic Telemetry Strip */}
             <div className="telemetry-kpi-strip">
               <div className="kpi-box">
-                <span className="kpi-value">{stats?.totalDiscoveries || discoveries.length}</span>
-                <span className="kpi-label">Total Duck Sightings</span>
+                <span className="kpi-value">🦆 {stats?.totalDiscoveries || discoveries.length}</span>
+                <span className="kpi-label">Pins</span>
               </div>
               <div className="kpi-box">
-                <span className="kpi-value">{stats?.uniqueCountriesCount || 1}</span>
-                <span className="kpi-label">Countries & Territories</span>
+                <span className="kpi-value">🌐 {stats?.uniqueCountriesCount || 1}</span>
+                <span className="kpi-label">Nations</span>
               </div>
               <div className="kpi-box">
-                <span className="kpi-value">{stats?.uniqueDucksFound || 1}/{ducks.length}</span>
-                <span className="kpi-label">Unique Ducks Spotted</span>
+                <span className="kpi-value">🏷️ {stats?.uniqueDucksFound || 1}/{ducks.length}</span>
+                <span className="kpi-label">Ducks</span>
               </div>
               <div className="kpi-box">
                 <span className="kpi-value">
-                  {((stats?.totalMilesTraveled || 0) / 1000).toFixed(1)}k mi
+                  📏 {((stats?.totalMilesTraveled || 0) / 1000).toFixed(1)}k mi
                 </span>
-                <span className="kpi-label">Total Distance to Ship</span>
+                <span className="kpi-label">Distance</span>
               </div>
             </div>
           </div>

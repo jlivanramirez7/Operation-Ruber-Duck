@@ -222,6 +222,38 @@ async function runTests() {
     console.log(`   ✅ Verified Device A duplicate blocked (HTTP 429) while Fellow Cruiser Device C on same ship NAT IP succeeded (HTTP 201)!`);
     passed++;
 
+    // ------------------------------------------------------------------------
+    // TEST 6: Gemini AI Background Note Moderator (5-Word Limit + Family-Safe Rewrite)
+    // ------------------------------------------------------------------------
+    console.log('\nTEST 6: Verifying Gemini AI Background Note Moderator (5-word limit + inappropriate text rewrite)...');
+    const deviceDFingerprint = `device_D_family_${Date.now()}`;
+    const longDirtyNote = 'Holy shit this damn duck sucks and is way too long for five words!';
+    const modRes = await requestJson(server, 'POST', '/api/discoveries', {
+      duckId: 'DUCK-022',
+      sig: generateDuckSignature('DUCK-022'),
+      city: 'Nassau',
+      region: 'New Providence',
+      country: 'Bahamas',
+      countryCode: 'BS',
+      lat: 25.0443,
+      lng: -77.3504,
+      note: longDirtyNote,
+      // Intentionally omit deckFound (verifying deck dropdown removal works seamlessly)
+      fingerprintHash: deviceDFingerprint
+    });
+
+    assert.strictEqual(modRes.status, 201, `Expected HTTP 201 Created, got ${modRes.status}`);
+    const savedNote = modRes.body.discovery.note;
+    const savedWordCount = savedNote.trim().split(/\s+/).filter(Boolean).length;
+    assert.ok(
+      savedWordCount <= 5,
+      `Saved note must be strictly <= 5 words (got ${savedWordCount} words: "${savedNote}")`
+    );
+    assert.ok(!/shit|damn|sucks/i.test(savedNote), `Inappropriate words must be completely scrubbed ("${savedNote}")`);
+    assert.strictEqual(modRes.body.discovery.noteModerated, true, 'noteModerated flag should be true');
+    console.log(`   ✅ Verified inappropriate 14-word input automatically rewritten by Gemini AI Moderator to clean ${savedWordCount}-word phrase: "${savedNote}"`);
+    passed++;
+
   } catch (err) {
     failed++;
     console.error('\n❌ TEST FAILED:', err);

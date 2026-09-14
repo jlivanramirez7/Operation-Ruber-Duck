@@ -149,6 +149,27 @@ app.get('/api/verify-qr', async (req, res) => {
   });
 });
 
+/**
+ * POST /api/moderate-note
+ * Background Gemini AI Moderator & 5-Word Family-Safe Scrubber
+ */
+const { moderateAndRewriteNote } = require('./services/geminiNoteModerator');
+app.post('/api/moderate-note', async (req, res) => {
+  try {
+    const rawNote = String(req.body?.note || '');
+    const result = await moderateAndRewriteNote(rawNote);
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
 // ============================================================================
 // STATIC REACT FRONTEND SERVING (Cloud Run Unified Container)
 // ============================================================================
