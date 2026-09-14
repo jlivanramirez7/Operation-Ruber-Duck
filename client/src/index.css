@@ -1432,3 +1432,10 @@ body {
   font-weight: 600;
 }
 
+.form-step-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 210, 184, 0.28), transparent);
+  margin: 1.35rem 0;
+}
+
+

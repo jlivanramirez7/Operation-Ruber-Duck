@@ -50,8 +50,6 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
   const [customCountryName, setCustomCountryName] = useState('United States');
   const [isSearchingGeocoder, setIsSearchingGeocoder] = useState(false);
   const [note, setNote] = useState('');
-  const [moderatedPreview, setModeratedPreview] = useState<string | null>(null);
-  const [isModerating, setIsModerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -60,37 +58,6 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
       setSelectedDuckId(initialDuckId.toUpperCase().trim());
     }
   }, [initialDuckId]);
-
-  // Background Gemini AI Note Moderator debounce check
-  useEffect(() => {
-    if (!note.trim()) {
-      setModeratedPreview(null);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      setIsModerating(true);
-      try {
-        const res = await fetch('/api/moderate-note', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ note })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.wasRewritten && data.finalNote) {
-            setModeratedPreview(data.finalNote);
-          } else {
-            setModeratedPreview(null);
-          }
-        }
-      } catch {
-        // silent background check
-      } finally {
-        setIsModerating(false);
-      }
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [note]);
 
   if (!isOpen) return null;
 
@@ -322,7 +289,10 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
             )}
           </div>
 
-          {/* Step 3: Optional 10-Word Note + Background Gemini AI Moderator */}
+          {/* 1-Line Visual Spacer Separating Location Question from Optional Message */}
+          <div className="form-step-divider" aria-hidden="true" />
+
+          {/* Step 3: Optional 10-Word Note (Background Vertex AI Moderation runs silently on submit) */}
           <div className="form-group">
             <div className="form-label-row">
               <label className="form-label">③ 💬 10-Word Vibe (Optional)</label>
@@ -354,18 +324,6 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
               value={note}
               onChange={e => handleNoteChange(e.target.value)}
             />
-
-            {/* Live Gemini AI Family-Safe Shield Feedback */}
-            <div className="gemini-shield-row">
-              <span className="gemini-shield-badge">
-                <Sparkles size={13} />
-                {isModerating
-                  ? 'Gemini AI checking...'
-                  : moderatedPreview
-                  ? `✨ Gemini AI polished: "${moderatedPreview}"`
-                  : '✨ Gemini AI Family-Safe Shield Active'}
-              </span>
-            </div>
           </div>
 
           {/* Micro-Trust Badge (Zero Reading Fatigue) */}
@@ -373,8 +331,6 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
             <span>🛡️ No Login</span>
             <span>•</span>
             <span>🔒 Zero PII</span>
-            <span>•</span>
-            <span>✨ Gemini Safe</span>
           </div>
 
           {errorMessage && <div className="form-error-alert">{errorMessage}</div>}
