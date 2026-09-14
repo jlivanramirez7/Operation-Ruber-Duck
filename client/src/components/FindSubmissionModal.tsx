@@ -312,13 +312,6 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
             </div>
           </div>
 
-          {/* Micro-Trust Badge (Zero Reading Fatigue) */}
-          <div className="micro-trust-pill">
-            <span>🛡️ No Login</span>
-            <span>•</span>
-            <span>🔒 Zero PII</span>
-          </div>
-
           {errorMessage && <div className="form-error-alert">{errorMessage}</div>}
 
           <div className="modal-actions">
