@@ -134,8 +134,15 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
       return;
     }
 
-    if (!selectedCity) {
-      setErrorMessage('Tap your hometown city first! 📍');
+    let cityToPin = selectedCity;
+    if (!cityToPin && cityQuery.trim().length > 0 && filteredCities.length > 0) {
+      // Auto-select top matching city if user typed their city and pressed Submit directly
+      cityToPin = filteredCities[0];
+      setSelectedCity(cityToPin);
+    }
+
+    if (!cityToPin) {
+      setErrorMessage('Please choose one of the city options below! 📍');
       return;
     }
 
@@ -148,12 +155,12 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
         body: JSON.stringify({
           duckId: selectedDuckId,
           sig: initialSignature,
-          city: selectedCity.city,
-          region: selectedCity.region,
-          country: selectedCity.country,
-          countryCode: selectedCity.countryCode,
-          lat: selectedCity.lat,
-          lng: selectedCity.lng,
+          city: cityToPin.city,
+          region: cityToPin.region,
+          country: cityToPin.country,
+          countryCode: cityToPin.countryCode,
+          lat: cityToPin.lat,
+          lng: cityToPin.lng,
           note: capToTenWords(note.trim()),
           deckFound: activeDuck.originDeck || 'Cruise Ship Deck',
           fingerprintHash
@@ -184,7 +191,7 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
         <div className="modal-header-tropical">
           <div className="modal-header-badge">
             <Sparkles size={16} />
-            <span>① 🦆 DUCK ➔ ② 📍 CITY ➔ ③ 🌍 PIN!</span>
+            <span>Step 1: 📍 City ➔ Step 2: 💬 Vibe ➔ Step 3: 🌍 Submit!</span>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close modal">
             <X size={20} />
@@ -192,11 +199,11 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          {/* Step 1: Locked Duck Identity Badge (Dictated strictly by QR Code) */}
+          {/* Locked Duck Identity Badge (Dictated strictly by QR Code) */}
           <div className="duck-id-banner">
             <div className="duck-id-icon">🦆</div>
             <div className="duck-id-details">
-              <span className="duck-select-label">① Duck Scanned</span>
+              <span className="duck-select-label">🦆 Duck Scanned</span>
               <div className="duck-locked-title">
                 {activeDuck.duckId} • {activeDuck.name}
               </div>
@@ -206,21 +213,27 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
             </span>
           </div>
 
-          {/* Step 2: Hometown City Picker */}
+          {/* Step 1: Hometown City Picker */}
           <div className="form-group">
             <label className="form-label">
-              <Globe2 size={16} /> ② 📍 Your Hometown City
+              <span className="step-pill">Step 1</span>
+              <Globe2 size={16} /> 📍 Your Hometown City
             </label>
             <input
               type="text"
               className="tropical-input"
-              placeholder="🔍 Type city (e.g. Miami, Toronto, London...)"
+              placeholder="🔍 Type city (e.g. Miami, Orlando, Galveston, Toronto...)"
               value={cityQuery}
               onChange={e => {
                 setCityQuery(e.target.value);
                 setSelectedCity(null);
               }}
             />
+
+            {/* Helper Prompt to make tapping a city option unmistakable */}
+            <div className="city-helper-hint">
+              <span>👇 Choose one of these:</span>
+            </div>
 
             {/* Quick Autocomplete Chips */}
             <div className="city-suggestions-grid">
@@ -236,7 +249,7 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
                   >
                     <MapPin size={13} />
                     <span>
-                      {c.city} ({c.countryCode})
+                      {c.city}{c.region ? `, ${c.region}` : ''} ({c.countryCode})
                     </span>
                     {isSelected && <CheckCircle2 size={14} className="chip-check" />}
                   </button>
@@ -278,10 +291,12 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
           {/* 1-Line Visual Spacer Separating Location Question from Optional Message */}
           <div className="form-step-divider" aria-hidden="true" />
 
-          {/* Step 3: Optional 10-Word Note (Background Vertex AI Moderation runs silently on submit) */}
+          {/* Step 2: Optional 10-Word Note (Background Vertex AI Moderation runs silently on submit) */}
           <div className="form-group">
             <div className="form-label-row">
-              <label className="form-label">③ 💬 10-Word Vibe (Optional)</label>
+              <label className="form-label">
+                <span className="step-pill">Step 2</span> 💬 10-Word Vibe (Optional)
+              </label>
               <span className={`char-counter ${wordCount >= 10 ? 'word-limit-reached' : ''}`}>
                 {wordCount}/10 words
               </span>
@@ -314,7 +329,8 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
 
           {errorMessage && <div className="form-error-alert">{errorMessage}</div>}
 
-          <div className="modal-actions modal-actions-single">
+          <div className="modal-actions modal-actions-step3">
+            <span className="step-pill step-pill-submit">Step 3 (Submit!)</span>
             <button type="submit" className="btn-caribbean-primary btn-full-width" disabled={isSubmitting}>
               {isSubmitting ? '🌍 Pinning...' : '🌴 Pin to 3D Globe!'}
             </button>
