@@ -60,7 +60,7 @@ class FirestoreService {
     this.lastError = null;
     this.triedFallback = false;
 
-    // Ensure initial local persistent files exist and include all 30 seed ducks
+    // Ensure initial local persistent files exist and include all 30 seed ducks with latest names/themes
     const existingDucks = readLocalJson(DUCKS_FILE, []);
     const duckMap = new Map();
     INITIAL_DUCKS.forEach(d => duckMap.set(d.duckId, d));
@@ -69,6 +69,8 @@ class FirestoreService {
       if (seed) {
         duckMap.set(d.duckId, {
           ...seed,
+          name: seed.name,
+          theme: seed.theme,
           findCount: Math.max(seed.findCount || 0, d.findCount || 0),
           firstFoundAt: d.firstFoundAt || seed.firstFoundAt,
           lastFoundAt: d.lastFoundAt || seed.lastFoundAt,
@@ -135,19 +137,25 @@ class FirestoreService {
       this.connected = true;
       this.lastError = null;
 
-      // Check if ducks collection needs seeding in Firestore
-      const ducksSnap = await this.client.collection('ducks').limit(1).get();
-      if (ducksSnap.empty) {
-        console.log(`[FirestoreService] Seeding initial ducks and discoveries into Cloud Firestore (${this.databaseId})...`);
-        const batch = this.client.batch();
-        for (const duck of INITIAL_DUCKS) {
-          batch.set(this.client.collection('ducks').doc(duck.duckId), duck);
-        }
+      // Sync latest duck names & themes to Firestore ducks collection
+      const batch = this.client.batch();
+      for (const duck of INITIAL_DUCKS) {
+        batch.set(
+          this.client.collection('ducks').doc(duck.duckId),
+          { name: duck.name, theme: duck.theme, signatureHash: duck.signatureHash, active: true },
+          { merge: true }
+        );
+      }
+      await batch.commit();
+
+      // Check if discoveries collection needs initial seeding in Firestore
+      const discSnap = await this.client.collection('discoveries').limit(1).get();
+      if (discSnap.empty) {
+        const discBatch = this.client.batch();
         for (const disc of INITIAL_DISCOVERIES) {
-          batch.set(this.client.collection('discoveries').doc(disc.id), disc);
+          discBatch.set(this.client.collection('discoveries').doc(disc.id), disc);
         }
-        await batch.commit();
-        console.log(`[FirestoreService] Cloud Firestore (${this.databaseId}) seeded successfully!`);
+        await discBatch.commit();
       }
       return true;
     } catch (err) {
@@ -161,10 +169,12 @@ class FirestoreService {
   }
 
   /**
-   * Lists all hidden cruise ducks (DUCK-001 to DUCK-025+)
+   * Lists all hidden cruise ducks (DUCK-001 to DUCK-030)
    */
   async listDucks() {
     let localDucks = readLocalJson(DUCKS_FILE, INITIAL_DUCKS);
+    const seedMap = new Map(INITIAL_DUCKS.map(d => [d.duckId, d]));
+
     if (this.client) {
       try {
         const snap = await this.client.collection('ducks').get();
@@ -175,9 +185,14 @@ class FirestoreService {
           localDucks.forEach(d => duckMap.set(d.duckId, d));
           fsDucks.forEach(d => {
             const existing = duckMap.get(d.duckId);
-            if (!existing || (d.findCount || 0) >= (existing.findCount || 0)) {
-              duckMap.set(d.duckId, d);
-            }
+            const seed = seedMap.get(d.duckId);
+            const merged = {
+              ...(existing || {}),
+              ...d,
+              name: seed ? seed.name : d.name,
+              theme: seed ? seed.theme : d.theme
+            };
+            duckMap.set(d.duckId, merged);
           });
           localDucks = Array.from(duckMap.values());
           writeLocalJson(DUCKS_FILE, localDucks);
@@ -186,7 +201,12 @@ class FirestoreService {
         await this.handleDatabaseError(err);
       }
     }
-    return localDucks.sort((a, b) => a.duckId.localeCompare(b.duckId));
+    return localDucks
+      .map(d => {
+        const seed = seedMap.get(d.duckId);
+        return seed ? { ...d, name: seed.name, theme: seed.theme } : d;
+      })
+      .sort((a, b) => a.duckId.localeCompare(b.duckId));
   }
 
   /**
