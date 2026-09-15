@@ -1238,18 +1238,18 @@ body {
   color: #041826;
   border: 1.5px dashed #008B7D;
   border-radius: 6px;
-  padding: 0.18cm 0.22cm;
+  padding: 0.12cm 0.16cm;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.22cm;
+  gap: 0.14cm;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
 .tag-qr-box {
   background: #ffffff;
-  padding: 0.05cm;
+  padding: 0.04cm;
   border-radius: 4px;
   border: 1px solid #D0E6F5;
   flex-shrink: 0;
@@ -1259,8 +1259,8 @@ body {
 }
 
 .tag-qr-img {
-  width: 2.3cm;
-  height: 2.3cm;
+  width: 2.0cm;
+  height: 2.0cm;
   display: block;
 }
 
@@ -1273,6 +1273,7 @@ body {
   flex: 1;
   min-width: 0;
   height: 100%;
+  gap: 0.03cm;
 }
 
 .tag-top-row {
@@ -1280,8 +1281,7 @@ body {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  gap: 0.1cm;
-  margin-bottom: 0.04cm;
+  gap: 0.08cm;
 }
 
 .tag-ahoy {
@@ -1294,38 +1294,38 @@ body {
 
 .tag-duck-id {
   font-family: var(--font-mono);
-  font-size: 7.5pt;
+  font-size: 6.8pt;
   font-weight: 900;
   color: #041826;
   background: #E6F8F6;
-  padding: 0.02cm 0.12cm;
+  padding: 0.02cm 0.09cm;
   border-radius: 3px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tag-duck-name {
-  font-weight: 800;
-  font-size: 8pt;
+  font-weight: 900;
+  font-size: 7.4pt;
   color: #041826;
-  line-height: 1.1;
-  margin-bottom: 0.04cm;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.12;
+  word-break: break-word;
   width: 100%;
 }
 
 .tag-call-to-action {
-  font-size: 6.2pt;
+  font-size: 5.8pt;
   color: #1D3E53;
-  line-height: 1.18;
-  margin: 0 0 0.05cm 0;
+  line-height: 1.15;
+  margin: 0;
   font-weight: 600;
+  width: 100%;
 }
 
 .tag-signature {
   font-family: var(--font-mono);
   font-size: 5.2pt;
+  font-weight: 700;
   color: #5C7A8C;
   white-space: nowrap;
 }

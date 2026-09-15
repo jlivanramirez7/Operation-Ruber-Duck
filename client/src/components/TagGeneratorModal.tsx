@@ -113,15 +113,15 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
 
                 <div className="tag-text-col">
                   <div className="tag-top-row">
-                    <span className="tag-ahoy">AHOY! FOUND ME! 🦆</span>
+                    <span className="tag-ahoy">🦆 FOUND ME!</span>
                     <strong className="tag-duck-id">{duck.duckId}</strong>
                   </div>
                   <div className="tag-duck-name">{duck.name}</div>
                   <p className="tag-call-to-action">
-                    Scan QR to pin your hometown on our 3D Globe! 🌍
+                    Scan QR to pin your city on our 3D Globe! 🌍
                   </p>
                   <span className="tag-signature">
-                    Operation Rubber Duck • 6.2×3.0cm
+                    Operation Rubber Duck 🌴
                   </span>
                 </div>
               </div>
