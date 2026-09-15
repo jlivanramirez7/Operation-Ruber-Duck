@@ -1224,94 +1224,123 @@ body {
 
 .printable-tag-sheet {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(234px, 1fr));
+  gap: 0.75rem;
+  justify-items: center;
 }
 
 .waterproof-tag-card {
+  width: 6.2cm;
+  height: 3.0cm;
+  box-sizing: border-box;
   position: relative;
   background: #ffffff;
   color: #041826;
-  border: 3px solid #00A896;
-  border-radius: 18px;
-  padding: 0.85rem;
-  text-align: center;
+  border: 1.5px dashed #008B7D;
+  border-radius: 6px;
+  padding: 0.18cm 0.22cm;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-}
-
-.tag-hole-punch {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid #041826;
-  background: #E2F2FF;
-  margin-bottom: 0.35rem;
-}
-
-.tag-card-header {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.4rem;
-}
-
-.tag-ahoy {
-  font-size: 0.68rem;
-  font-weight: 800;
-  color: #007A6E;
-}
-
-.tag-duck-id {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 800;
-  color: #041826;
+  gap: 0.22cm;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
 
 .tag-qr-box {
   background: #ffffff;
-  padding: 0.35rem;
-  border-radius: 10px;
+  padding: 0.05cm;
+  border-radius: 4px;
   border: 1px solid #D0E6F5;
-  margin-bottom: 0.45rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tag-qr-img {
-  width: 125px;
-  height: 125px;
+  width: 2.3cm;
+  height: 2.3cm;
   display: block;
+}
+
+.tag-text-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.tag-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.1cm;
+  margin-bottom: 0.04cm;
+}
+
+.tag-ahoy {
+  font-size: 6.2pt;
+  font-weight: 800;
+  color: #007A6E;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.tag-duck-id {
+  font-family: var(--font-mono);
+  font-size: 7.5pt;
+  font-weight: 900;
+  color: #041826;
+  background: #E6F8F6;
+  padding: 0.02cm 0.12cm;
+  border-radius: 3px;
+  white-space: nowrap;
 }
 
 .tag-duck-name {
   font-weight: 800;
-  font-size: 0.85rem;
+  font-size: 8pt;
   color: #041826;
+  line-height: 1.1;
+  margin-bottom: 0.04cm;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .tag-call-to-action {
-  font-size: 0.72rem;
-  color: #204B66;
-  line-height: 1.25;
-  margin: 0.2rem 0;
+  font-size: 6.2pt;
+  color: #1D3E53;
+  line-height: 1.18;
+  margin: 0 0 0.05cm 0;
+  font-weight: 600;
 }
 
 .tag-signature {
   font-family: var(--font-mono);
-  font-size: 0.64rem;
-  color: #6B8B9E;
+  font-size: 5.2pt;
+  color: #5C7A8C;
+  white-space: nowrap;
 }
 
-/* Print Stylesheet for Physical Waterproof Tags */
+/* Print Stylesheet for Physical Waterproof Tags (6.2cm x 3.0cm stickers for 7cm x 3.5cm tags) */
 @media print {
   @page {
-    size: letter;
-    margin: 0.35in;
+    size: letter portrait;
+    margin: 0.3in;
   }
   body {
     background: #ffffff !important;
     color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   .caribbean-navbar,
   .caribbean-main,
@@ -1333,16 +1362,22 @@ body {
   }
   .printable-tag-sheet {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0.35in !important;
+    grid-template-columns: repeat(3, 6.2cm) !important;
+    justify-content: center !important;
+    gap: 0.25cm 0.35cm !important;
     page-break-after: auto !important;
   }
   .waterproof-tag-card {
+    width: 6.2cm !important;
+    height: 3.0cm !important;
+    box-sizing: border-box !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
     -webkit-column-break-inside: avoid !important;
-    border: 2px dashed #204B66 !important;
-    margin-bottom: 0.15in !important;
+    border: 1px dashed #333333 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0.16cm 0.2cm !important;
   }
 }
 

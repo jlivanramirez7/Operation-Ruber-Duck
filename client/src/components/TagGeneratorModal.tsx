@@ -80,18 +80,18 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
           <div className="tag-spec-summary">
             <ShieldCheck size={16} />
             <span>
-              <strong>All 30 Ducks Ready to Print:</strong> DUCK-001 through DUCK-030 with cryptographic HMAC signatures • Zero page-cut protection enabled for Print Preview.
+              <strong>Sized for 7.0 cm × 3.5 cm Duck Tags:</strong> Each sticker cutout is <strong>6.2 cm × 3.0 cm</strong> (erring on the side of smaller for easy trimming & hole punch clearance) • 3 columns × 8 rows per page with zero page-break splits.
             </span>
           </div>
           <div className="tag-studio-actions">
             <button type="button" className="btn-caribbean-primary" onClick={handlePrintTags}>
               <Printer size={16} />
-              <span>Print All {ducks.length} Waterproof Tags</span>
+              <span>Print All {ducks.length} Stickers (6.2 × 3.0 cm)</span>
             </button>
           </div>
         </div>
 
-        {/* Printable Waterproof Tag Grid (All 30 Ducks with Page-Break Protection) */}
+        {/* Printable Waterproof Tag Grid (All 30 Ducks - 6.2cm x 3.0cm Landscape Sticker Cutouts) */}
         <div className="printable-tag-sheet">
           {ducks.map(duck => {
             const qrTargetUrl = `${baseUrl}/?id=${duck.duckId}&sig=${duck.signatureHash}`;
@@ -103,12 +103,6 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
 
             return (
               <div key={duck.duckId} className="waterproof-tag-card">
-                <div className="tag-hole-punch" title="3mm Zip-Tie / Stainless Loop Punch" />
-                <div className="tag-card-header">
-                  <span className="tag-ahoy">AHOY! YOU FOUND ME! 🦆🌴</span>
-                  <strong className="tag-duck-id">{duck.duckId}</strong>
-                </div>
-
                 <div className="tag-qr-box">
                   <img
                     src={qrImgSrc}
@@ -117,13 +111,17 @@ export const TagGeneratorModal: React.FC<TagGeneratorModalProps> = ({
                   />
                 </div>
 
-                <div className="tag-card-footer">
+                <div className="tag-text-col">
+                  <div className="tag-top-row">
+                    <span className="tag-ahoy">AHOY! FOUND ME! 🦆</span>
+                    <strong className="tag-duck-id">{duck.duckId}</strong>
+                  </div>
                   <div className="tag-duck-name">{duck.name}</div>
                   <p className="tag-call-to-action">
-                    Scan me to pin your hometown on our 3D Cruise Duck Globe!
+                    Scan QR to pin your hometown on our 3D Globe! 🌍
                   </p>
                   <span className="tag-signature">
-                    Operation Rubber Duck • Sig: {duck.signatureHash}
+                    Operation Rubber Duck • 6.2×3.0cm
                   </span>
                 </div>
               </div>
