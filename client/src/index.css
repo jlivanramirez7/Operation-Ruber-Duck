@@ -1911,16 +1911,18 @@ body {
 
   /* 5. Mobile Modals & iOS Safari 16px Input Zoom Prevention */
   .modal-backdrop {
-    padding: 0.5rem;
-    align-items: flex-end;
+    padding: 1rem;
+    align-items: center;
+    justify-content: center;
   }
 
   .caribbean-modal {
     width: 100%;
-    max-width: 100%;
-    max-height: 92dvh;
-    padding: 1.05rem;
-    border-radius: 20px 20px 14px 14px;
+    max-width: 440px;
+    max-height: 90dvh;
+    margin: auto;
+    padding: 1.15rem;
+    border-radius: 20px;
     overflow-y: auto;
   }
 
