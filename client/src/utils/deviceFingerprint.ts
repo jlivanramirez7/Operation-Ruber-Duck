@@ -48,6 +48,8 @@ export function checkLocalDuckCooldown(duckId: string): { allowed: boolean; minu
   }
 }
 
+const HAS_SUBMITTED_KEY = 'cruiseduck_has_submitted_any_v1';
+
 export function recordLocalDuckSubmission(duckId: string): void {
   try {
     const cleanId = duckId.toUpperCase().trim();
@@ -55,7 +57,31 @@ export function recordLocalDuckSubmission(duckId: string): void {
     const records: Record<string, number> = raw ? JSON.parse(raw) : {};
     records[cleanId] = Date.now();
     localStorage.setItem(COOLDOWN_STORAGE_KEY, JSON.stringify(records));
+    localStorage.setItem(HAS_SUBMITTED_KEY, 'true');
   } catch {
     // ignore storage errors in private browsing
+  }
+}
+
+export function hasDeviceSubmittedBefore(): boolean {
+  try {
+    if (localStorage.getItem(HAS_SUBMITTED_KEY) === 'true') {
+      return true;
+    }
+    const raw = localStorage.getItem(COOLDOWN_STORAGE_KEY);
+    if (!raw) return false;
+    const records = JSON.parse(raw) as Record<string, number>;
+    return Object.keys(records).length > 0;
+  } catch {
+    return false;
+  }
+}
+
+export function clearLocalDeviceSubmissionHistory(): void {
+  try {
+    localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+    localStorage.removeItem(HAS_SUBMITTED_KEY);
+  } catch {
+    // ignore
   }
 }

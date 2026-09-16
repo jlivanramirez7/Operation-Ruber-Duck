@@ -21,6 +21,7 @@ import { DuckCatalogModal } from './components/DuckCatalogModal';
 import { TagGeneratorModal } from './components/TagGeneratorModal';
 import { CruiseStats, Discovery, Duck, ShipPosition } from './types/duck';
 import { formatPinnedTimestamp } from './utils/timeFormat';
+import { clearLocalDeviceSubmissionHistory } from './utils/deviceFingerprint';
 
 const LOCAL_CACHE_KEY = 'cruiseduck_offline_discoveries_cache_v1';
 
@@ -134,6 +135,7 @@ export const App: React.FC = () => {
     try {
       const res = await fetch('/api/admin/clear-db', { method: 'POST' });
       if (res.ok) {
+        clearLocalDeviceSubmissionHistory();
         localStorage.removeItem('cruiseduck_submissions_v1');
         localStorage.removeItem(LOCAL_CACHE_KEY);
         setSelectedDiscovery(null);

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, Globe2, MapPin, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { CheckCircle2, Globe2, MapPin, X } from 'lucide-react';
 import { BUNDLED_WORLD_CITIES } from '../data/worldCities';
 import { Duck, WorldCity } from '../types/duck';
 import {
   checkLocalDuckCooldown,
   getDeviceFingerprintHash,
+  hasDeviceSubmittedBefore,
   recordLocalDuckSubmission
 } from '../utils/deviceFingerprint';
 
@@ -18,10 +19,9 @@ interface FindSubmissionModalProps {
 }
 
 const QUICK_VIBE_NOTES = [
-  { emoji: '🍦', text: 'Found hiding by the soft serve ice cream machine!' },
-  { emoji: '🍹', text: 'Chilling out by the sunny Lido pool bar!' },
-  { emoji: '🤫', text: 'Secretly re-hidden on deck for the next hunter!' },
-  { emoji: '☀️', text: 'Having the best family Caribbean cruise vacation ever!' }
+  { emoji: '🍦', label: 'Ice cream spot!', text: 'Found hiding by the soft serve ice cream machine!' },
+  { emoji: '🍹', label: 'Pool deck!', text: 'Chilling out by the sunny Lido pool bar!' },
+  { emoji: '🤫', label: 'Re-hiding it!', text: 'Secretly re-hidden on deck for the next hunter!' }
 ];
 
 function countWords(text: string): number {
@@ -52,6 +52,7 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [canDismiss, setCanDismiss] = useState<boolean>(false);
 
   useEffect(() => {
     if (initialDuckId) {
@@ -59,24 +60,32 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
     }
   }, [initialDuckId]);
 
+  useEffect(() => {
+    if (isOpen) {
+      // Check if this device has ever submitted a duck before.
+      // Only devices that have previously submitted get the 'X' button to dismiss without submitting.
+      setCanDismiss(hasDeviceSubmittedBefore());
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const activeDuck = ducks.find(d => d.duckId === selectedDuckId) || {
     duckId: selectedDuckId,
-    name: `Cruise Duck ${selectedDuckId}`,
-    theme: 'Caribbean Explorer Duck',
+    name: `Sir Quacks-a-Lot`,
+    theme: 'Pirate Booty Boss',
     originDeck: 'Cruise Ship Deck'
   };
 
-  // Filter bundled world cities
+  // Filter bundled world cities (limit to 4 clean suggestions to avoid visual clutter)
   const filteredCities = cityQuery.trim()
     ? BUNDLED_WORLD_CITIES.filter(
         c =>
           c.city.toLowerCase().includes(cityQuery.toLowerCase()) ||
           c.country.toLowerCase().includes(cityQuery.toLowerCase()) ||
           c.region.toLowerCase().includes(cityQuery.toLowerCase())
-      ).slice(0, 6)
-    : BUNDLED_WORLD_CITIES.slice(0, 6);
+      ).slice(0, 4)
+    : BUNDLED_WORLD_CITIES.slice(0, 4);
 
   const handleSelectBundledCity = (c: WorldCity) => {
     setSelectedCity(c);
@@ -84,7 +93,7 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
     setErrorMessage(null);
   };
 
-  // Fallback Nominatim lookup for smaller towns not in the bundled top list
+  // Fallback Nominatim lookup for smaller towns not in the bundled list
   const handleLookupCustomTown = async () => {
     if (!customCityName.trim()) return;
     setIsSearchingGeocoder(true);
@@ -136,13 +145,12 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
 
     let cityToPin = selectedCity;
     if (!cityToPin && cityQuery.trim().length > 0 && filteredCities.length > 0) {
-      // Auto-select top matching city if user typed their city and pressed Submit directly
       cityToPin = filteredCities[0];
       setSelectedCity(cityToPin);
     }
 
     if (!cityToPin) {
-      setErrorMessage('Please choose one of the city options below! 📍');
+      setErrorMessage('Please tap one of the city options below! 📍');
       return;
     }
 
@@ -173,6 +181,7 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
       }
 
       recordLocalDuckSubmission(selectedDuckId);
+      setCanDismiss(true);
       onSubmissionSuccess(data.discovery);
       onClose();
     } catch (err: any) {
@@ -185,117 +194,134 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
   const wordCount = countWords(note);
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="caribbean-modal" onClick={e => e.stopPropagation()}>
-        {/* Wordless Pictographic Header Strip */}
+    <div
+      className="modal-backdrop"
+      onClick={() => {
+        if (canDismiss) onClose();
+      }}
+    >
+      <div className="caribbean-modal simplified-intake-modal" onClick={e => e.stopPropagation()}>
+        {/* Clean Single Header Bar */}
         <div className="modal-header-tropical">
-          <div className="modal-header-badge">
-            <Sparkles size={16} />
-            <span>Step 1: 📍 City ➔ Step 2: 💬 Vibe ➔ Step 3: 🌍 Submit!</span>
+          <div className="duck-header-title">
+            <span className="duck-emoji-badge">🦆</span>
+            <div>
+              <div className="duck-found-eyebrow">{activeDuck.duckId} • FOUND!</div>
+              <h2 className="duck-found-name">{activeDuck.name}</h2>
+            </div>
           </div>
-          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close modal">
-            <X size={20} />
-          </button>
+          {canDismiss && (
+            <button
+              type="button"
+              className="modal-close-btn"
+              onClick={onClose}
+              aria-label="Close modal"
+              title="Close form"
+            >
+              <X size={20} />
+            </button>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-form">
-          {/* Locked Duck Identity Badge (Dictated strictly by QR Code) */}
-          <div className="duck-id-banner">
-            <div className="duck-id-icon">🦆</div>
-            <div className="duck-id-details">
-              <span className="duck-select-label">🦆 Duck Scanned</span>
-              <div className="duck-locked-title">
-                {activeDuck.duckId} • {activeDuck.name}
-              </div>
-            </div>
-            <span className="verified-tag-pill" title="Authentic Waterproof QR Tag Scanned">
-              <ShieldCheck size={14} /> ✓ QR Tag
-            </span>
-          </div>
-
+        <form onSubmit={handleSubmit} className="modal-form simplified-form">
           {/* Step 1: Hometown City Picker */}
           <div className="form-group">
             <label className="form-label">
               <span className="step-pill">Step 1</span>
-              <Globe2 size={16} /> 📍 Your Hometown City
+              <Globe2 size={15} /> 📍 Your Hometown City
             </label>
-            <input
-              type="text"
-              className="tropical-input"
-              placeholder="🔍 Type city (e.g. Miami, Orlando, Galveston, Toronto...)"
-              value={cityQuery}
-              onChange={e => {
-                setCityQuery(e.target.value);
-                setSelectedCity(null);
-              }}
-            />
 
-            {/* Helper Prompt to make tapping a city option unmistakable */}
-            <div className="city-helper-hint">
-              <span>👇 Choose one of these:</span>
-            </div>
-
-            {/* Quick Autocomplete Chips */}
-            <div className="city-suggestions-grid">
-              {filteredCities.map(c => {
-                const isSelected =
-                  selectedCity?.city === c.city && selectedCity?.country === c.country;
-                return (
-                  <button
-                    key={`${c.city}-${c.country}-${c.lat}`}
-                    type="button"
-                    className={`city-chip ${isSelected ? 'city-chip-selected' : ''}`}
-                    onClick={() => handleSelectBundledCity(c)}
-                  >
-                    <MapPin size={13} />
-                    <span>
-                      {c.city}{c.region ? `, ${c.region}` : ''} ({c.countryCode})
-                    </span>
-                    {isSelected && <CheckCircle2 size={14} className="chip-check" />}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Custom Town Lookup (only if not in bundled list) */}
-            {!selectedCity && cityQuery.length > 2 && filteredCities.length === 0 && (
-              <div className="custom-town-box">
-                <div className="custom-town-row">
-                  <input
-                    type="text"
-                    className="tropical-input"
-                    placeholder="City Name"
-                    value={customCityName}
-                    onChange={e => setCustomCityName(e.target.value)}
-                  />
-                  <input
-                    type="text"
-                    className="tropical-input"
-                    placeholder="Country"
-                    value={customCountryName}
-                    onChange={e => setCustomCountryName(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="lookup-btn"
-                    onClick={handleLookupCustomTown}
-                    disabled={isSearchingGeocoder}
-                  >
-                    {isSearchingGeocoder ? '...' : '📍 Pin'}
-                  </button>
+            {selectedCity ? (
+              <div className="selected-city-card">
+                <div className="selected-city-info">
+                  <CheckCircle2 size={18} className="selected-city-check" />
+                  <span>
+                    <strong>{selectedCity.city}</strong>
+                    {selectedCity.region ? `, ${selectedCity.region}` : ''} ({selectedCity.country})
+                  </span>
                 </div>
+                <button
+                  type="button"
+                  className="btn-change-city"
+                  onClick={() => {
+                    setSelectedCity(null);
+                    setCityQuery('');
+                  }}
+                >
+                  Change
+                </button>
               </div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  className="tropical-input"
+                  placeholder="🔍 Type your city (e.g. Miami, Toronto...)"
+                  value={cityQuery}
+                  onChange={e => {
+                    setCityQuery(e.target.value);
+                    setSelectedCity(null);
+                  }}
+                />
+
+                <div className="city-helper-hint">
+                  <span>👇 Choose one of these:</span>
+                </div>
+
+                <div className="city-suggestions-grid">
+                  {filteredCities.map(c => (
+                    <button
+                      key={`${c.city}-${c.country}-${c.lat}`}
+                      type="button"
+                      className="city-chip"
+                      onClick={() => handleSelectBundledCity(c)}
+                    >
+                      <MapPin size={13} />
+                      <span>
+                        {c.city}
+                        {c.region ? `, ${c.region}` : ''} ({c.countryCode})
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {cityQuery.length > 2 && filteredCities.length === 0 && (
+                  <div className="custom-town-box">
+                    <div className="custom-town-row">
+                      <input
+                        type="text"
+                        className="tropical-input"
+                        placeholder="City Name"
+                        value={customCityName}
+                        onChange={e => setCustomCityName(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className="tropical-input"
+                        placeholder="Country"
+                        value={customCountryName}
+                        onChange={e => setCustomCountryName(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="lookup-btn"
+                        onClick={handleLookupCustomTown}
+                        disabled={isSearchingGeocoder}
+                      >
+                        {isSearchingGeocoder ? '...' : '📍 Pin'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          {/* 1-Line Visual Spacer Separating Location Question from Optional Message */}
-          <div className="form-step-divider" aria-hidden="true" />
-
-          {/* Step 2: Optional 10-Word Note (Background Vertex AI Moderation runs silently on submit) */}
+          {/* Step 2: Optional 10-Word Note */}
           <div className="form-group">
             <div className="form-label-row">
               <label className="form-label">
-                <span className="step-pill">Step 2</span> 💬 10-Word Vibe (Optional)
+                <span className="step-pill">Step 2</span> 💬 Short Vibe (Optional)
               </label>
               <span className={`char-counter ${wordCount >= 10 ? 'word-limit-reached' : ''}`}>
                 {wordCount}/10 words
@@ -306,22 +332,21 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
               type="text"
               maxLength={90}
               className="tropical-input"
-              placeholder="✍️ Max 10 words (e.g. Found hiding by the soft serve ice cream machine! 🍦)"
+              placeholder="✍️ Optional note (max 10 words)"
               value={note}
               onChange={e => handleNoteChange(e.target.value)}
             />
 
-            {/* 1-Tap Emoji Mood Chips (Under text box to mirror Hometown City layout) */}
-            <div className="quick-vibe-chips">
+            <div className="quick-vibe-chips-compact">
               {QUICK_VIBE_NOTES.map(v => (
                 <button
-                  key={v.text}
+                  key={v.label}
                   type="button"
-                  className="vibe-chip-btn"
+                  className="vibe-chip-compact-btn"
                   onClick={() => setNote(v.text)}
                 >
                   <span>{v.emoji}</span>
-                  <span>{v.text}</span>
+                  <span>{v.label}</span>
                 </button>
               ))}
             </div>
@@ -329,10 +354,10 @@ export const FindSubmissionModal: React.FC<FindSubmissionModalProps> = ({
 
           {errorMessage && <div className="form-error-alert">{errorMessage}</div>}
 
-          <div className="modal-actions modal-actions-step3">
-            <span className="step-pill step-pill-submit">Step 3 (Submit!)</span>
-            <button type="submit" className="btn-caribbean-primary btn-full-width" disabled={isSubmitting}>
-              {isSubmitting ? '🌍 Pinning...' : '🌴 Pin to 3D Globe!'}
+          <div className="modal-actions-step3">
+            <button type="submit" className="btn-caribbean-primary btn-full-width btn-step3-submit" disabled={isSubmitting}>
+              <span className="step-pill step-pill-inline">Step 3 (Submit!)</span>
+              <span>{isSubmitting ? '🌍 Pinning...' : '🌴 Pin to 3D Globe!'}</span>
             </button>
           </div>
         </form>
