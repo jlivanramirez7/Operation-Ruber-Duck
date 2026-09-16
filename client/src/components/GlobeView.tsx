@@ -39,8 +39,9 @@ function getIdealCameraZ(width: number, height: number): number {
   const halfHFov = Math.atan(aspect * Math.tan(halfVFov));
   const minHalfFov = Math.min(halfVFov, halfHFov);
 
-  // Include Earth radius (100) + atmosphere halo + pin heads + comfortable starry margin (1.26x)
-  const effectiveRadius = GLOBE_RADIUS * 1.26;
+  // Add extra margin on narrow mobile screens so 100% of Earth + pins fit with zero clipping
+  const mobileMargin = aspect < 0.85 ? 1.32 : 1.26;
+  const effectiveRadius = GLOBE_RADIUS * mobileMargin;
   return Math.round(effectiveRadius / Math.sin(minHalfFov));
 }
 
@@ -67,10 +68,8 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
     isAutoRotatingRef.current = isAutoRotating;
   }, [isAutoRotating]);
 
-  // Smoothly center globe on a specific (lat, lng)
+  // Smoothly center globe on a specific (lat, lng) WITHOUT stopping auto-rotation
   const centerGlobeOnLatLng = (lat: number, lng: number) => {
-    setIsAutoRotating(false);
-    isAutoRotatingRef.current = false;
     targetRotationRef.current = {
       x: Math.max(-0.9, Math.min(0.9, (lat * Math.PI) / 180)),
       y: -((lng + 90) * Math.PI) / 180
@@ -245,8 +244,6 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
     // 8. Pointer / Touch Interactive Rotation & Zoom Listeners
     const onPointerDown = (e: MouseEvent | TouchEvent) => {
       isDraggingRef.current = true;
-      setIsAutoRotating(false);
-      isAutoRotatingRef.current = false;
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
       previousMouseRef.current = { x: clientX, y: clientY };
@@ -417,7 +414,8 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
             title="Center Globe on Cruise Ship in the Caribbean"
           >
             <Ship size={15} />
-            <span>Center on Cruise Ship</span>
+            <span className="desktop-only-label">Center on Cruise Ship</span>
+            <span className="mobile-only-label">Ship</span>
           </button>
 
           <button
@@ -425,6 +423,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
             className="globe-control-btn"
             onClick={() => handleZoom(-28)}
             title="Zoom In"
+            aria-label="Zoom In"
           >
             <ZoomIn size={15} />
           </button>
@@ -434,6 +433,7 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
             className="globe-control-btn"
             onClick={() => handleZoom(28)}
             title="Zoom Out"
+            aria-label="Zoom Out"
           >
             <ZoomOut size={15} />
           </button>
@@ -441,10 +441,10 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
 
         <div className="globe-legend-inline">
           <span className="legend-item">
-            <span className="legend-dot dot-hometown" /> Finder Hometown Pin
+            <span className="legend-dot dot-hometown" /> Hometown Pin
           </span>
           <span className="legend-item">
-            <span className="legend-dot dot-ship" /> Caribbean Cruise Ship
+            <span className="legend-dot dot-ship" /> Cruise Ship
           </span>
         </div>
       </div>

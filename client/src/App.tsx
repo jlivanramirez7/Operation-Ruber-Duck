@@ -59,9 +59,7 @@ export const App: React.FC = () => {
         if (Array.isArray(discData.discoveries)) {
           setDiscoveries(discData.discoveries);
           localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(discData.discoveries));
-          if (discData.discoveries.length > 0) {
-            setSelectedDiscovery(discData.discoveries[0]);
-          } else {
+          if (discData.discoveries.length === 0) {
             setSelectedDiscovery(null);
           }
         }
