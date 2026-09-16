@@ -176,6 +176,34 @@ app.post('/api/moderate-note', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/admin/clear-db
+ * Wipes all discoveries & rate limits from DB and resets all 30 ducks to 0 finds (keeps schema intact)
+ */
+app.post('/api/admin/clear-db', async (req, res) => {
+  try {
+    const result = await firestoreService.clearAllDiscoveriesAndResetDucks();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+app.delete('/api/discoveries', async (req, res) => {
+  try {
+    const result = await firestoreService.clearAllDiscoveriesAndResetDucks();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
 // ============================================================================
 // STATIC REACT FRONTEND SERVING (Cloud Run Unified Container)
 // ============================================================================

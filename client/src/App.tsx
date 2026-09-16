@@ -12,6 +12,7 @@ import {
   QrCode,
   RefreshCw,
   Ship,
+  Trash2,
   Trophy
 } from 'lucide-react';
 import { GlobeView } from './components/GlobeView';
@@ -34,6 +35,8 @@ export const App: React.FC = () => {
   const [scannedDuckId, setScannedDuckId] = useState<string>('DUCK-001');
   const [scannedSignature, setScannedSignature] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [confirmClearDb, setConfirmClearDb] = useState<boolean>(false);
+  const [isClearingDb, setIsClearingDb] = useState<boolean>(false);
 
   const shipPosition: ShipPosition = stats?.shipPosition || {
     name: 'Caribbean Sea (Grand Turk / St. Thomas Corridor)',
@@ -55,8 +58,10 @@ export const App: React.FC = () => {
         if (Array.isArray(discData.discoveries)) {
           setDiscoveries(discData.discoveries);
           localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(discData.discoveries));
-          if (!selectedDiscovery && discData.discoveries.length > 0) {
+          if (discData.discoveries.length > 0) {
             setSelectedDiscovery(discData.discoveries[0]);
+          } else {
+            setSelectedDiscovery(null);
           }
         }
       }
@@ -118,6 +123,31 @@ export const App: React.FC = () => {
     });
   };
 
+  const handleClearDatabase = async () => {
+    if (!confirmClearDb) {
+      setConfirmClearDb(true);
+      setTimeout(() => setConfirmClearDb(false), 5000);
+      return;
+    }
+
+    setIsClearingDb(true);
+    try {
+      const res = await fetch('/api/admin/clear-db', { method: 'POST' });
+      if (res.ok) {
+        localStorage.removeItem('cruiseduck_submissions_v1');
+        localStorage.removeItem(LOCAL_CACHE_KEY);
+        setSelectedDiscovery(null);
+        setDiscoveries([]);
+        await fetchAllData();
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsClearingDb(false);
+      setConfirmClearDb(false);
+    }
+  };
+
   return (
     <div className="caribbean-app-shell">
       {/* Top Tropical Navigation Bar (Zero Reading Fatigue) */}
@@ -151,6 +181,24 @@ export const App: React.FC = () => {
           >
             <QrCode size={16} />
             <span>QR Tags</span>
+          </button>
+
+          {/* Pre-Cruise Testing DB Clear Button (Remove right before cruise departure) */}
+          <button
+            type="button"
+            className={`nav-btn-secondary ${confirmClearDb ? 'nav-btn-danger-confirm' : 'nav-btn-danger'}`}
+            onClick={handleClearDatabase}
+            disabled={isClearingDb}
+            title="Clear all discoveries and reset all 30 ducks to 0 finds (keeps schema intact)"
+          >
+            <Trash2 size={15} />
+            <span>
+              {isClearingDb
+                ? 'Clearing...'
+                : confirmClearDb
+                ? '⚠️ Tap to Confirm Wipe!'
+                : 'Clear DB'}
+            </span>
           </button>
 
           {Boolean(scannedSignature) && (

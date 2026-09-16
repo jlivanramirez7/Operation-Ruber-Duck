@@ -254,31 +254,38 @@ async function runTests() {
     console.log(`   ✅ Verified inappropriate 16-word input automatically rewritten by Gemini AI Moderator to clean ${savedWordCount}-word phrase: "${savedNote}"`);
     passed++;
 
+    // ------------------------------------------------------------------------
+    // TEST 7: Verifying Clear DB Endpoint (POST /api/admin/clear-db)
+    // ------------------------------------------------------------------------
+    console.log('\nTEST 7: Verifying Clear DB Endpoint (wipes discoveries, resets all 30 ducks to 0 finds, keeps schema)...');
+    const clearRes = await requestJson(server, 'POST', '/api/admin/clear-db', {});
+    assert.strictEqual(clearRes.status, 200, 'POST /api/admin/clear-db should return HTTP 200');
+    assert.strictEqual(clearRes.body.success, true, 'Clear DB response must report success=true');
+    assert.strictEqual(clearRes.body.ducksResetCount, 30, 'All 30 ducks must be reset');
+
+    // Verify GET /api/discoveries returns 0 discoveries
+    const postClearDiscRes = await requestJson(server, 'GET', '/api/discoveries');
+    assert.strictEqual(postClearDiscRes.body.discoveries.length, 0, 'Discoveries count must be 0 after Clear DB');
+
+    // Verify all 30 ducks have findCount === 0 and valid schema/HMAC signatures
+    const postClearDucksRes = await requestJson(server, 'GET', '/api/ducks');
+    assert.strictEqual(postClearDucksRes.body.ducks.length, 30, 'Must still return all 30 ducks');
+    for (const d of postClearDucksRes.body.ducks) {
+      assert.strictEqual(d.findCount, 0, `Duck ${d.duckId} findCount must be 0 after Clear DB`);
+      assert.strictEqual(d.firstFoundAt, null, `Duck ${d.duckId} firstFoundAt must be null`);
+      assert.ok(d.name && d.name.trim().split(/\s+/).length <= 3, `Duck ${d.duckId} name ("${d.name}") must be <= 3 words`);
+      assert.strictEqual(d.signatureHash, generateDuckSignature(d.duckId), `Duck ${d.duckId} HMAC signature must be intact`);
+    }
+    console.log('   ✅ Verified Clear DB endpoint wiped all discoveries & reset all 30 ducks to 0 finds with intact schema!');
+    passed++;
+
   } catch (err) {
     failed++;
     console.error('\n❌ TEST FAILED:', err);
   } finally {
     server.close();
-    // Restore clean seed state so automated test runs never leave test records on the live globe
-    const fs = require('fs');
-    const path = require('path');
-    const { INITIAL_DUCKS, INITIAL_DISCOVERIES } = require('../data/seedDucks');
-    const formattedDiscoveries = INITIAL_DISCOVERIES.map(d => ({
-      ...d,
-      pinnedAtFormatted: new Date(d.createdAt).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      }),
-      pinnedTimeEpochMs: new Date(d.createdAt).getTime()
-    }));
-    fs.writeFileSync(path.join(__dirname, '../data/persistent_ducks.json'), JSON.stringify(INITIAL_DUCKS, null, 2));
-    fs.writeFileSync(path.join(__dirname, '../data/persistent_discoveries.json'), JSON.stringify(formattedDiscoveries, null, 2));
-    fs.writeFileSync(path.join(__dirname, '../data/persistent_rate_limits.json'), JSON.stringify({}, null, 2));
+    // Ensure Cloud Firestore (`operationruberduck-db`) and local JSON stores remain completely clean (0 discoveries)
+    await firestoreService.clearAllDiscoveriesAndResetDucks();
   }
 
   console.log('\n================================================================================');

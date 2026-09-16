@@ -476,6 +476,62 @@ class FirestoreService {
         : null
     };
   }
+
+  /**
+   * Clears all discoveries & rate limits from DB and resets all 30 ducks to 0 finds (keeps schema intact)
+   */
+  async clearAllDiscoveriesAndResetDucks() {
+    // 1. Reset local persistent JSON stores
+    const cleanDucks = INITIAL_DUCKS.map(d => ({
+      ...d,
+      findCount: 0,
+      firstFoundAt: null,
+      lastFoundAt: null,
+      lastFoundByCity: null
+    }));
+
+    writeLocalJson(DUCKS_FILE, cleanDucks);
+    writeLocalJson(DISCOVERIES_FILE, []);
+    writeLocalJson(RATE_LIMITS_FILE, {});
+
+    let firestoreCleared = false;
+    if (this.client) {
+      try {
+        // Delete all discoveries in batches
+        const discSnap = await this.client.collection('discoveries').get();
+        if (!discSnap.empty) {
+          const batch = this.client.batch();
+          discSnap.docs.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+        }
+
+        // Delete all rate limits in batches
+        const rateSnap = await this.client.collection('rate_limits').get();
+        if (!rateSnap.empty) {
+          const rateBatch = this.client.batch();
+          rateSnap.docs.forEach(doc => rateBatch.delete(doc.ref));
+          await rateBatch.commit();
+        }
+
+        // Reset all 30 ducks to 0 finds in Firestore while keeping schema intact
+        const ducksBatch = this.client.batch();
+        for (const duck of cleanDucks) {
+          ducksBatch.set(this.client.collection('ducks').doc(duck.duckId), duck);
+        }
+        await ducksBatch.commit();
+        firestoreCleared = true;
+      } catch (err) {
+        await this.handleDatabaseError(err);
+      }
+    }
+
+    return {
+      success: true,
+      message: 'All database discoveries and rate limits cleared. All 30 ducks reset to 0 finds (schema preserved).',
+      ducksResetCount: cleanDucks.length,
+      firestoreCleared
+    };
+  }
 }
 
 module.exports = new FirestoreService();
