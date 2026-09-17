@@ -516,6 +516,387 @@ const HD_WORLD_POLYGONS: PolygonFeature[] = [
 ];
 
 /**
+ * Major International Country Borders [lng, lat][]
+ * Rendered as subtle tactical lines across landmasses so individual countries stand out cleanly.
+ */
+const HD_COUNTRY_BORDERS: Array<{ name: string; points: [number, number][] }> = [
+  // ================= NORTH & CENTRAL AMERICA =================
+  {
+    name: 'USA - Canada (Main 49th Parallel & Eastern Border)',
+    points: [
+      [-123.2, 49.0], [-95.1, 49.0], [-92.1, 48.0], [-88.0, 48.0], [-84.0, 46.5],
+      [-82.5, 43.0], [-79.0, 43.2], [-74.7, 45.0], [-71.5, 45.0], [-67.8, 47.2], [-67.0, 45.2]
+    ]
+  },
+  {
+    name: 'USA - Canada (Alaska - Yukon/BC)',
+    points: [
+      [-141.0, 69.6], [-141.0, 60.0], [-135.0, 59.0], [-130.0, 55.0]
+    ]
+  },
+  {
+    name: 'USA - Mexico (Pacific to Gulf of Mexico)',
+    points: [
+      [-117.1, 32.5], [-114.8, 32.7], [-111.0, 31.3], [-108.2, 31.3], [-106.5, 31.8],
+      [-104.5, 29.5], [-103.0, 29.0], [-101.4, 29.8], [-99.5, 27.5], [-97.1, 25.9]
+    ]
+  },
+  {
+    name: 'Mexico - Guatemala & Belize',
+    points: [
+      [-92.2, 14.5], [-91.4, 16.0], [-90.5, 17.8], [-89.1, 17.8], [-88.3, 18.5]
+    ]
+  },
+  {
+    name: 'Guatemala - Belize & Honduras/El Salvador',
+    points: [
+      [-89.1, 17.8], [-89.2, 15.9], [-88.2, 15.7], [-89.3, 14.4], [-90.1, 13.8]
+    ]
+  },
+  {
+    name: 'Honduras - Nicaragua',
+    points: [
+      [-83.2, 15.0], [-85.5, 14.0], [-87.5, 13.0]
+    ]
+  },
+  {
+    name: 'Nicaragua - Costa Rica',
+    points: [
+      [-83.7, 10.9], [-85.6, 11.2]
+    ]
+  },
+  {
+    name: 'Costa Rica - Panama',
+    points: [
+      [-82.5, 9.6], [-82.9, 8.3]
+    ]
+  },
+  {
+    name: 'Panama - Colombia',
+    points: [
+      [-77.2, 8.6], [-77.9, 7.2]
+    ]
+  },
+  {
+    name: 'Haiti - Dominican Republic (Hispaniola)',
+    points: [
+      [-71.8, 19.7], [-71.7, 18.9], [-71.8, 18.0]
+    ]
+  },
+
+  // ================= SOUTH AMERICA =================
+  {
+    name: 'Colombia - Venezuela',
+    points: [
+      [-71.8, 12.2], [-72.5, 9.0], [-72.0, 7.0], [-67.8, 6.2], [-67.0, 1.8]
+    ]
+  },
+  {
+    name: 'Venezuela - Guyana',
+    points: [
+      [-60.0, 8.5], [-61.4, 6.0], [-60.7, 5.2]
+    ]
+  },
+  {
+    name: 'Guyana - Suriname',
+    points: [
+      [-57.1, 6.0], [-58.0, 4.0], [-56.5, 2.0]
+    ]
+  },
+  {
+    name: 'Suriname - French Guiana',
+    points: [
+      [-54.0, 5.8], [-54.2, 4.0], [-54.5, 2.2]
+    ]
+  },
+  {
+    name: 'French Guiana - Brazil',
+    points: [
+      [-51.6, 4.0], [-53.0, 2.2]
+    ]
+  },
+  {
+    name: 'Brazil Northern Border (Venezuela, Guyana, Suriname)',
+    points: [
+      [-67.0, 1.8], [-64.0, 3.8], [-60.7, 5.2], [-59.8, 3.3], [-58.5, 1.5],
+      [-56.5, 2.0], [-53.0, 2.2]
+    ]
+  },
+  {
+    name: 'Colombia - Ecuador & Peru',
+    points: [
+      [-78.8, 1.4], [-77.6, 0.8], [-75.2, -0.1], [-71.0, -2.2], [-70.0, -4.2]
+    ]
+  },
+  {
+    name: 'Ecuador - Peru',
+    points: [
+      [-80.3, -3.5], [-79.0, -5.0], [-78.4, -3.0], [-75.2, -1.0]
+    ]
+  },
+  {
+    name: 'Brazil Western Border (Colombia, Peru, Bolivia)',
+    points: [
+      [-67.0, 1.8], [-70.0, -4.2], [-73.8, -7.4], [-70.5, -11.0], [-65.3, -10.5],
+      [-60.2, -14.0], [-57.8, -19.0]
+    ]
+  },
+  {
+    name: 'Peru - Bolivia & Chile',
+    points: [
+      [-69.6, -11.0], [-69.0, -14.5], [-69.4, -17.5], [-70.4, -18.3]
+    ]
+  },
+  {
+    name: 'Bolivia - Chile, Argentina & Paraguay',
+    points: [
+      [-69.4, -17.5], [-68.0, -22.5], [-62.6, -22.2], [-61.9, -20.0], [-58.2, -20.2]
+    ]
+  },
+  {
+    name: 'Paraguay - Brazil & Argentina',
+    points: [
+      [-57.8, -19.0], [-57.6, -22.1], [-54.3, -24.0], [-54.6, -25.6], [-58.6, -27.3],
+      [-57.6, -25.3], [-62.6, -22.2]
+    ]
+  },
+  {
+    name: 'Brazil - Argentina & Uruguay',
+    points: [
+      [-54.6, -25.6], [-53.7, -26.8], [-57.6, -30.2], [-53.4, -33.7]
+    ]
+  },
+  {
+    name: 'Uruguay - Argentina',
+    points: [
+      [-57.6, -30.2], [-58.4, -34.0]
+    ]
+  },
+  {
+    name: 'Chile - Argentina (Andes Spine)',
+    points: [
+      [-68.0, -22.5], [-68.5, -27.0], [-70.0, -33.0], [-71.0, -39.0], [-72.0, -46.0],
+      [-73.0, -50.0], [-68.6, -52.3], [-68.6, -54.9]
+    ]
+  },
+
+  // ================= EUROPE =================
+  {
+    name: 'Portugal - Spain',
+    points: [
+      [-8.8, 41.8], [-6.2, 41.5], [-7.0, 39.0], [-7.4, 37.2]
+    ]
+  },
+  {
+    name: 'Spain - France (Pyrenees)',
+    points: [
+      [-1.8, 43.4], [0.5, 42.7], [3.2, 42.4]
+    ]
+  },
+  {
+    name: 'France - Belgium, Germany, Switzerland & Italy',
+    points: [
+      [2.5, 51.1], [4.2, 50.0], [6.0, 49.5], [8.2, 49.0], [7.6, 47.6],
+      [6.0, 46.2], [6.8, 45.8], [7.0, 44.2], [7.5, 43.8]
+    ]
+  },
+  {
+    name: 'Netherlands & Belgium - Germany',
+    points: [
+      [3.4, 51.4], [5.8, 51.2], [6.2, 51.8], [7.2, 53.3]
+    ]
+  },
+  {
+    name: 'Germany - Denmark',
+    points: [
+      [8.6, 54.9], [9.5, 54.8]
+    ]
+  },
+  {
+    name: 'Germany - Poland & Czechia',
+    points: [
+      [14.2, 53.9], [14.7, 51.0], [12.1, 50.3], [13.8, 48.8]
+    ]
+  },
+  {
+    name: 'Germany & Austria - Switzerland & Italy',
+    points: [
+      [7.6, 47.6], [9.6, 47.5], [13.0, 47.8], [13.8, 48.8], [16.9, 48.0],
+      [16.5, 46.8], [13.7, 46.5], [13.8, 45.6]
+    ]
+  },
+  {
+    name: 'Poland - Czechia, Slovakia, Ukraine & Belarus',
+    points: [
+      [14.7, 51.0], [18.9, 49.5], [22.6, 49.1], [24.1, 50.5], [23.9, 52.0], [23.5, 54.0]
+    ]
+  },
+  {
+    name: 'Hungary, Romania & Balkans',
+    points: [
+      [16.9, 48.0], [22.9, 48.0], [26.6, 48.2], [28.2, 45.5], [28.6, 43.7],
+      [22.7, 44.2], [19.0, 45.9], [16.5, 46.8]
+    ]
+  },
+  {
+    name: 'Greece Northern Border',
+    points: [
+      [20.0, 39.8], [21.0, 40.9], [23.0, 41.3], [26.2, 41.7], [26.0, 40.8]
+    ]
+  },
+  {
+    name: 'Norway - Sweden & Finland',
+    points: [
+      [11.2, 59.0], [12.3, 61.5], [14.0, 64.5], [18.0, 68.5], [20.6, 69.0],
+      [24.2, 67.0], [24.1, 65.8]
+    ]
+  },
+  {
+    name: 'Finland - Russia',
+    points: [
+      [27.8, 60.5], [31.5, 62.5], [30.0, 66.0], [29.0, 69.0]
+    ]
+  },
+  {
+    name: 'Baltic States & Ukraine - Russia/Belarus',
+    points: [
+      [28.2, 59.4], [27.5, 57.5], [28.2, 56.0], [26.6, 55.3], [23.5, 54.0],
+      [24.1, 51.5], [30.5, 52.0], [34.0, 52.2], [38.0, 50.0], [40.2, 49.3], [38.2, 47.1]
+    ]
+  },
+
+  // ================= AFRICA & MIDDLE EAST =================
+  {
+    name: 'Morocco - Algeria',
+    points: [
+      [-2.2, 35.1], [-1.2, 32.2], [-4.5, 30.0], [-8.7, 28.5]
+    ]
+  },
+  {
+    name: 'Algeria - Tunisia & Libya',
+    points: [
+      [8.6, 36.9], [7.5, 33.0], [9.5, 30.2], [11.9, 23.5]
+    ]
+  },
+  {
+    name: 'Libya - Egypt',
+    points: [
+      [25.1, 31.6], [25.0, 22.0]
+    ]
+  },
+  {
+    name: 'Egypt - Sudan (22nd Parallel)',
+    points: [
+      [25.0, 22.0], [36.9, 22.0]
+    ]
+  },
+  {
+    name: 'Sahel & East Africa (Chad, Sudan, Ethiopia, Kenya, Somalia)',
+    points: [
+      [11.9, 23.5], [24.0, 19.5], [22.5, 13.0], [35.0, 11.5], [36.5, 14.5],
+      [38.5, 18.0], [42.8, 11.0], [47.0, 8.0], [42.0, 4.2], [36.0, 4.5],
+      [34.0, 1.0], [34.0, -1.0], [37.6, -3.2], [39.2, -4.7]
+    ]
+  },
+  {
+    name: 'Southern Africa (Namibia, Botswana, Zimbabwe, South Africa)',
+    points: [
+      [16.5, -28.6], [20.0, -28.5], [20.0, -25.0], [26.0, -24.6], [29.4, -22.2],
+      [31.5, -22.4], [32.0, -26.0], [32.9, -26.8]
+    ]
+  },
+  {
+    name: 'Turkey - Syria, Iraq, Iran & Caucasus',
+    points: [
+      [36.0, 36.8], [42.4, 37.1], [44.8, 39.7], [41.5, 41.5]
+    ]
+  },
+  {
+    name: 'Levant & Arabian Peninsula (Israel, Jordan, Iraq, Saudi Arabia, Yemen, Oman)',
+    points: [
+      [34.3, 31.2], [35.5, 32.7], [39.0, 33.4], [42.0, 32.0], [47.5, 29.1],
+      [48.5, 30.0], [46.0, 33.5], [44.8, 37.1]
+    ]
+  },
+  {
+    name: 'Saudi Arabia - Yemen & Oman',
+    points: [
+      [42.8, 16.5], [47.0, 17.0], [52.0, 19.0], [55.2, 22.5], [51.5, 24.2]
+    ]
+  },
+  {
+    name: 'Iran - Afghanistan & Pakistan',
+    points: [
+      [61.2, 35.6], [60.8, 31.0], [63.2, 27.2], [61.6, 25.2]
+    ]
+  },
+
+  // ================= ASIA & OCEANIA =================
+  {
+    name: 'Russia - Kazakhstan Border',
+    points: [
+      [48.0, 47.0], [51.0, 51.5], [61.0, 51.0], [70.0, 55.0], [80.0, 51.0], [87.3, 49.1]
+    ]
+  },
+  {
+    name: 'Russia - Mongolia & China Border',
+    points: [
+      [87.3, 49.1], [95.0, 50.5], [106.0, 50.3], [116.0, 49.8], [121.0, 53.3],
+      [127.5, 50.0], [135.0, 48.5], [131.0, 42.5]
+    ]
+  },
+  {
+    name: 'Mongolia - China Southern Border',
+    points: [
+      [87.8, 49.0], [96.0, 43.0], [105.0, 42.0], [111.5, 43.5], [119.8, 46.8], [116.0, 49.8]
+    ]
+  },
+  {
+    name: 'India - Pakistan Border',
+    points: [
+      [68.2, 23.8], [70.0, 27.0], [74.5, 31.5], [74.8, 34.5], [77.0, 35.5]
+    ]
+  },
+  {
+    name: 'India - China, Nepal & Bhutan (Himalayas)',
+    points: [
+      [77.0, 35.5], [80.0, 31.0], [88.0, 27.8], [92.0, 27.8], [97.4, 28.2]
+    ]
+  },
+  {
+    name: 'India - Bangladesh & Myanmar',
+    points: [
+      [88.5, 26.5], [89.8, 25.2], [92.4, 25.0], [92.7, 22.0], [94.5, 25.0], [97.4, 28.2]
+    ]
+  },
+  {
+    name: 'China - Myanmar, Laos & Vietnam',
+    points: [
+      [97.4, 28.2], [98.8, 24.0], [101.5, 21.5], [104.0, 22.8], [108.0, 21.5]
+    ]
+  },
+  {
+    name: 'Southeast Asia (Thailand, Myanmar, Laos, Cambodia, Vietnam)',
+    points: [
+      [98.5, 10.0], [99.0, 14.5], [98.0, 18.5], [100.5, 20.4], [104.8, 17.4],
+      [105.5, 14.4], [102.5, 13.5], [102.9, 11.7]
+    ]
+  },
+  {
+    name: 'China - North Korea & South Korea DMZ',
+    points: [
+      [124.3, 40.0], [128.0, 42.0], [130.6, 42.5], [128.4, 38.6], [126.2, 37.8]
+    ]
+  },
+  {
+    name: 'Papua New Guinea - Indonesia (New Guinea Island)',
+    points: [
+      [141.0, -2.6], [141.0, -9.1]
+    ]
+  }
+];
+
+/**
  * Generates an ultra-crisp 4K HD (4096x2048) Caribbean Navigation World Map Canvas Texture.
  * Designed for high contrast between sapphire ocean bathymetry and vibrant tropical emerald landmasses.
  */
@@ -589,7 +970,7 @@ export function createWorldGlobeTexture(): THREE.CanvasTexture {
   });
   ctx.restore();
 
-  // 4. PASS 2: High-Contrast Emerald-Teal Landmass Fill + Dual-Layer Shorelines
+  // 4. PASS 2A: High-Contrast Emerald-Teal Landmass Fill
   const landGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
   landGrad.addColorStop(0, '#1B6E6A');
   landGrad.addColorStop(0.35, '#218378');
@@ -606,10 +987,45 @@ export function createWorldGlobeTexture(): THREE.CanvasTexture {
       else ctx.lineTo(x, y);
     });
     ctx.closePath();
-
-    // High-contrast landmass fill
     ctx.fillStyle = landGrad;
     ctx.fill();
+  });
+
+  // 5. PASS 2B: Render Faint Major Country Borders across landmasses
+  ctx.save();
+  ctx.setLineDash([7, 5]);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  HD_COUNTRY_BORDERS.forEach(border => {
+    ctx.beginPath();
+    border.points.forEach(([lng, lat], idx) => {
+      const x = lngToX(lng);
+      const y = latToY(lat);
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    // Subtle soft glow underneath country border
+    ctx.lineWidth = 2.6;
+    ctx.strokeStyle = 'rgba(0, 245, 212, 0.22)';
+    ctx.stroke();
+
+    // Crisp faint inner dashed country line
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = 'rgba(175, 255, 244, 0.52)';
+    ctx.stroke();
+  });
+  ctx.restore();
+
+  // 6. PASS 2C: Render Dual-Layer Illuminated Coastal Shorelines on top
+  landmasses.forEach(poly => {
+    ctx.beginPath();
+    poly.points.forEach(([lng, lat], idx) => {
+      const x = lngToX(lng);
+      const y = latToY(lat);
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
 
     // Outer turquoise shoreline glow
     ctx.lineWidth = 4.0;
