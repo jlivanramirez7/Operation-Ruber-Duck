@@ -153,13 +153,16 @@ export const GlobeView: React.FC<GlobeViewProps> = ({
     globeGroupRef.current = globeGroup;
     scene.add(globeGroup);
 
-    // 5. 3D Earth Sphere with High-Resolution Vector World Map Canvas Texture
-    const earthGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+    // 5. 3D Earth Sphere with 4K High-Definition Vector World Map Canvas Texture
+    const earthGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 96, 96);
     const earthTexture = createWorldGlobeTexture();
+    earthTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    earthTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    earthTexture.magFilter = THREE.LinearFilter;
     const earthMat = new THREE.MeshPhongMaterial({
       map: earthTexture,
       specular: new THREE.Color(0x00d2b8),
-      shininess: 22
+      shininess: 24
     });
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     globeGroup.add(earthMesh);
