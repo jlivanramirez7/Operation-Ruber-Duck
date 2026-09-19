@@ -178,9 +178,18 @@ app.post('/api/moderate-note', async (req, res) => {
 
 /**
  * POST /api/admin/clear-db
- * Wipes all discoveries & rate limits from DB and resets all 30 ducks to 0 finds (keeps schema intact)
+ * Wipes all discoveries & rate limits from DB and resets all 30 ducks to 0 finds (keeps schema intact).
+ * Protected by x-admin-reset-key header so no external user can trigger it during the cruise.
  */
+const ADMIN_RESET_KEY = process.env.ADMIN_RESET_KEY || 'operation-rubber-duck-admin-2026';
+
 app.post('/api/admin/clear-db', async (req, res) => {
+  if (req.headers['x-admin-reset-key'] !== ADMIN_RESET_KEY) {
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden: Admin reset key required.'
+    });
+  }
   try {
     const result = await firestoreService.clearAllDiscoveriesAndResetDucks();
     res.json(result);
@@ -193,6 +202,12 @@ app.post('/api/admin/clear-db', async (req, res) => {
 });
 
 app.delete('/api/discoveries', async (req, res) => {
+  if (req.headers['x-admin-reset-key'] !== ADMIN_RESET_KEY) {
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden: Admin reset key required.'
+    });
+  }
   try {
     const result = await firestoreService.clearAllDiscoveriesAndResetDucks();
     res.json(result);

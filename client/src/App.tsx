@@ -12,16 +12,13 @@ import {
   QrCode,
   RefreshCw,
   Ship,
-  Trash2,
   Trophy
 } from 'lucide-react';
 import { GlobeView } from './components/GlobeView';
 import { FindSubmissionModal } from './components/FindSubmissionModal';
 import { DuckCatalogModal } from './components/DuckCatalogModal';
-import { TagGeneratorModal } from './components/TagGeneratorModal';
 import { CruiseStats, Discovery, Duck, ShipPosition } from './types/duck';
 import { formatPinnedTimestamp } from './utils/timeFormat';
-import { clearLocalDeviceSubmissionHistory } from './utils/deviceFingerprint';
 
 const LOCAL_CACHE_KEY = 'cruiseduck_offline_discoveries_cache_v1';
 
@@ -32,12 +29,9 @@ export const App: React.FC = () => {
   const [selectedDiscovery, setSelectedDiscovery] = useState<Discovery | null>(null);
   const [isFindModalOpen, setIsFindModalOpen] = useState(false);
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
-  const [isTagStudioOpen, setIsTagStudioOpen] = useState(false);
   const [scannedDuckId, setScannedDuckId] = useState<string>('DUCK-001');
   const [scannedSignature, setScannedSignature] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [confirmClearDb, setConfirmClearDb] = useState<boolean>(false);
-  const [isClearingDb, setIsClearingDb] = useState<boolean>(false);
 
   const shipPosition: ShipPosition = stats?.shipPosition || {
     name: 'Caribbean Sea (Grand Turk / St. Thomas Corridor)',
@@ -122,32 +116,6 @@ export const App: React.FC = () => {
     });
   };
 
-  const handleClearDatabase = async () => {
-    if (!confirmClearDb) {
-      setConfirmClearDb(true);
-      setTimeout(() => setConfirmClearDb(false), 5000);
-      return;
-    }
-
-    setIsClearingDb(true);
-    try {
-      const res = await fetch('/api/admin/clear-db', { method: 'POST' });
-      if (res.ok) {
-        clearLocalDeviceSubmissionHistory();
-        localStorage.removeItem('cruiseduck_submissions_v1');
-        localStorage.removeItem(LOCAL_CACHE_KEY);
-        setSelectedDiscovery(null);
-        setDiscoveries([]);
-        await fetchAllData();
-      }
-    } catch {
-      // ignore
-    } finally {
-      setIsClearingDb(false);
-      setConfirmClearDb(false);
-    }
-  };
-
   return (
     <div className="caribbean-app-shell">
       {/* Top Tropical Navigation Bar (Zero Reading Fatigue) */}
@@ -171,34 +139,6 @@ export const App: React.FC = () => {
           >
             <Award size={16} />
             <span>30 Ducks</span>
-          </button>
-
-          <button
-            type="button"
-            className="nav-btn-secondary"
-            onClick={() => setIsTagStudioOpen(true)}
-            aria-label="Open QR Tag Studio"
-          >
-            <QrCode size={16} />
-            <span>QR Tags</span>
-          </button>
-
-          {/* Pre-Cruise Testing DB Clear Button (Remove right before cruise departure) */}
-          <button
-            type="button"
-            className={`nav-btn-secondary ${confirmClearDb ? 'nav-btn-danger-confirm' : 'nav-btn-danger'}`}
-            onClick={handleClearDatabase}
-            disabled={isClearingDb}
-            title="Clear all discoveries and reset all 30 ducks to 0 finds (keeps schema intact)"
-          >
-            <Trash2 size={15} />
-            <span>
-              {isClearingDb
-                ? 'Clearing...'
-                : confirmClearDb
-                ? '⚠️ Tap to Confirm Wipe!'
-                : 'Clear DB'}
-            </span>
           </button>
 
           {Boolean(scannedSignature) && (
@@ -414,12 +354,6 @@ export const App: React.FC = () => {
         onClose={() => setIsCatalogModalOpen(false)}
         ducks={ducks}
         discoveries={discoveries}
-      />
-
-      <TagGeneratorModal
-        isOpen={isTagStudioOpen}
-        onClose={() => setIsTagStudioOpen(false)}
-        ducks={ducks}
       />
     </div>
   );

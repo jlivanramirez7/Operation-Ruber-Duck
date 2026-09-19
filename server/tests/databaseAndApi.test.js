@@ -18,7 +18,7 @@ const {
 } = require('../services/antiSpamService');
 const { generateDuckSignature } = require('../data/seedDucks');
 
-function requestJson(server, method, path, body = null) {
+function requestJson(server, method, path, body = null, extraHeaders = {}) {
   return new Promise((resolve, reject) => {
     const addr = server.address();
     const options = {
@@ -27,7 +27,8 @@ function requestJson(server, method, path, body = null) {
       path,
       method,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...extraHeaders
       }
     };
 
@@ -255,11 +256,20 @@ async function runTests() {
     passed++;
 
     // ------------------------------------------------------------------------
-    // TEST 7: Verifying Clear DB Endpoint (POST /api/admin/clear-db)
+    // TEST 7: Verifying Clear DB Endpoint Protection & Cleanup (POST /api/admin/clear-db)
     // ------------------------------------------------------------------------
-    console.log('\nTEST 7: Verifying Clear DB Endpoint (wipes discoveries, resets all 30 ducks to 0 finds, keeps schema)...');
-    const clearRes = await requestJson(server, 'POST', '/api/admin/clear-db', {});
-    assert.strictEqual(clearRes.status, 200, 'POST /api/admin/clear-db should return HTTP 200');
+    console.log('\nTEST 7: Verifying Clear DB Endpoint protection (403 without admin key) & authorized cleanup...');
+    const unauthClearRes = await requestJson(server, 'POST', '/api/admin/clear-db', {});
+    assert.strictEqual(unauthClearRes.status, 403, 'Unauthorized POST /api/admin/clear-db must be blocked with HTTP 403');
+
+    const clearRes = await requestJson(
+      server,
+      'POST',
+      '/api/admin/clear-db',
+      {},
+      { 'x-admin-reset-key': 'operation-rubber-duck-admin-2026' }
+    );
+    assert.strictEqual(clearRes.status, 200, 'Authorized POST /api/admin/clear-db should return HTTP 200');
     assert.strictEqual(clearRes.body.success, true, 'Clear DB response must report success=true');
     assert.strictEqual(clearRes.body.ducksResetCount, 30, 'All 30 ducks must be reset');
 
